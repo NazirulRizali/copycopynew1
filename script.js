@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - With Map Integration
+   script.js - Complete Logic (Auth, Map, Booking, PDF, Calendar)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================
-    // 1. MAP LOGIC (NEW SECTION)
+    // 1. MAP LOGIC
     // =========================================================
     const mapElement = document.getElementById('dashboard-map');
     
@@ -127,6 +127,53 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log("Geolocation access denied or error.");
             });
         }
+    }
+
+    // =========================================================
+    // NEW: CUSTOM DATE PICKER (Side-by-Side Time)
+    // =========================================================
+    
+    // Only run if the inputs exist on the page
+    if (document.getElementById("pickup-date")) {
+        const datePickerConfig = {
+            enableTime: true,
+            dateFormat: "d/m/Y h:i K", // Format: 05/12/2025 10:00 AM
+            time_24hr: false,
+            defaultHour: 10,
+            minuteIncrement: 1,
+            monthSelectorType: "static",
+            
+            // Add custom Footer Buttons (Clear / Today)
+            onReady: function(selectedDates, dateStr, instance) {
+                const footer = document.createElement("div");
+                footer.classList.add("flatpickr-footer");
+
+                // Clear Button
+                const clearBtn = document.createElement("button");
+                clearBtn.innerText = "Clear";
+                clearBtn.classList.add("flatpickr-btn");
+                clearBtn.addEventListener("click", () => {
+                    instance.clear();
+                    instance.close();
+                });
+
+                // Today Button
+                const todayBtn = document.createElement("button");
+                todayBtn.innerText = "Today";
+                todayBtn.classList.add("flatpickr-btn");
+                todayBtn.addEventListener("click", () => {
+                    instance.setDate(new Date());
+                });
+
+                footer.appendChild(clearBtn);
+                footer.appendChild(todayBtn);
+                instance.calendarContainer.appendChild(footer);
+            }
+        };
+
+        // Initialize pickers
+        flatpickr("#pickup-date", datePickerConfig);
+        flatpickr("#dropoff-date", datePickerConfig);
     }
 
     // =========================================================
