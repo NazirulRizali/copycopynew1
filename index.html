@@ -4,23 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SafeRent Car Dashboard</title>
+    
     <link rel="stylesheet" href="styles.css">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+
     <nav class="navbar">
-        <div class="logo"><span class="logo-orange">SafeRent</span> <span class="logo-white">Car</span></div>
+        <div class="logo">
+            <span class="logo-orange">SafeRent</span> <span class="logo-white">Car</span>
+        </div>
         <div class="nav-links">
-            <a href="#">My Bookings</a>
+            <a href="my-bookings.html">My Bookings</a>
             <a href="#">Support</a>
             <a href="#" class="btn-logout">Logout</a>
         </div>
     </nav>
 
     <main class="container">
+        
         <section class="search-card">
             <h2>Find Your Perfect Ride</h2>
+            
             <div class="search-grid">
                 <div class="input-group full-width">
                     <label>Pick-up Location</label>
@@ -43,25 +56,60 @@
                     </div>
                 </div>
             </div>
+
             <button id="search-btn" class="btn-search">Search for Cars</button>
+        </section>
+
+        <section class="map-section">
+            <h3><i class="fa-solid fa-location-dot"></i> Available Locations & You</h3>
+            <div id="dashboard-map"></div>
         </section>
 
         <section class="offers-section">
             <h3>Exclusive Offers</h3>
             <div class="divider"></div>
+
             <div class="offers-grid">
                 <div class="offer-card">
-                     <div class="card-image-placeholder"><span>Economy Car</span></div>
-                     <div class="card-content"><h4>Weekend Special</h4><p>Save 20%...</p><a href="#" class="link-book">Book Now</a></div>
+                    <div class="card-image-placeholder"><span>Economy Car</span></div>
+                    <div class="card-content">
+                        <h4>Weekend Special</h4>
+                        <p>Save 20% on any economy class vehicle for 3-day rentals.</p>
+                        <a href="#" class="link-book">Book Now <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
                 </div>
+                <div class="offer-card">
+                    <div class="card-image-placeholder"><span>SUV Vehicle</span></div>
+                    <div class="card-content">
+                        <h4>Family Adventure</h4>
+                        <p>15% off all SUVs and minivans for rentals over 5 days.</p>
+                        <a href="#" class="link-book">Book Now <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
                 </div>
+                <div class="offer-card">
+                    <div class="card-image-placeholder"><span>Luxury Sedan</span></div>
+                    <div class="card-content">
+                        <h4>Premium Travel</h4>
+                        <p>Upgrade to a luxury sedan at the price of a standard car.</p>
+                        <a href="#" class="link-book">Book Now <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
         </section>
+
     </main>
 
     <footer>
         <p>&copy; 2025 SafeRent Car. All rights reserved.</p>
     </footer>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <script src="script.js"></script>
+
 </body>
 </html>
