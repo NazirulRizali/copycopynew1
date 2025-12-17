@@ -303,3 +303,95 @@ footer a {
 .leaflet-container a.leaflet-popup-close-button {
     color: #ccc;
 }
+
+/* =========================================
+   CUSTOM FLATPICKR STYLE (Side-by-Side)
+   ========================================= */
+
+/* 1. Make the container wide enough for side-by-side */
+.flatpickr-calendar {
+    width: 480px !important; /* Increase width */
+    padding: 10px;
+}
+
+/* 2. Flex container to put Calendar & Time side-by-side */
+.flatpickr-innerContainer {
+    display: flex;
+    flex-direction: row;
+}
+
+/* 3. Adjust the Days container width */
+.flatpickr-rContainer {
+    display: inline-block;
+    width: 310px; /* Standard calendar width */
+    border-right: 1px solid #e6e6e6; /* Separator line */
+    padding-right: 10px;
+}
+
+/* 4. Style the Time Picker to sit on the right */
+.flatpickr-time {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    width: 130px !important;
+    height: auto !important;
+    border-top: none !important;
+    padding-left: 10px;
+}
+
+/* 5. Custom Blue Headers for Time (Hour/Min/AMPM) */
+.flatpickr-time .flatpickr-time-separator,
+.flatpickr-time .numInputWrapper {
+    color: #333;
+    font-weight: bold;
+}
+
+/* Blue background for the time inputs like the photo */
+.flatpickr-time input.flatpickr-hour, 
+.flatpickr-time input.flatpickr-minute,
+.flatpickr-time .flatpickr-am-pm {
+    background: #007bff;
+    color: white !important;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    height: 40px;
+    line-height: 40px;
+    border: none;
+}
+.flatpickr-time input:focus {
+    background: #0056b3;
+}
+
+/* Labels (HR, MIN, AM/PM) - simulating headers */
+.time-label-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: white;
+    background: #007bff;
+    padding: 5px;
+    border-radius: 4px 4px 0 0;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+/* 6. Footer Buttons (Clear / Today) */
+.flatpickr-footer {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid #e6e6e6;
+    margin-top: 10px;
+}
+
+.flatpickr-btn {
+    background: transparent;
+    border: none;
+    color: #007bff;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+}
+.flatpickr-btn:hover {
+    text-decoration: underline;
+}
