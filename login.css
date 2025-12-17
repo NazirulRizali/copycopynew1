@@ -1,0 +1,106 @@
+/* =========================================
+   LOGIN PAGE STYLES
+   ========================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: #080808; /* Deep black/gray background */
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-card {
+    background-color: #1a1a1a; /* Dark gray card */
+    padding: 3rem 2.5rem;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+.login-card h2 {
+    color: #ffffff;
+    text-align: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+.input-group {
+    margin-bottom: 1rem;
+}
+
+.input-group input {
+    width: 100%;
+    background-color: #2b2b2b; /* Input background */
+    border: none;
+    padding: 0.9rem 1rem;
+    border-radius: 8px;
+    color: #e0e0e0;
+    font-size: 0.95rem;
+    outline: none;
+    transition: background-color 0.2s;
+}
+
+.input-group input:focus {
+    background-color: #383838;
+}
+
+.input-group input::placeholder {
+    color: #6b6b6b;
+    font-weight: 500;
+}
+
+.btn-login {
+    width: 100%;
+    background-color: #2b2bff; /* Bright Blue */
+    color: white;
+    border: none;
+    padding: 0.9rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+    transition: background-color 0.2s;
+}
+
+.btn-login:hover {
+    background-color: #1a1aff;
+}
+
+.login-footer {
+    text-align: center;
+}
+
+.login-footer p {
+    color: #b0b0b0;
+    font-size: 0.9rem;
+}
+
+.login-footer a {
+    color: #4da6ff; /* Lighter blue for link */
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-footer a:hover {
+    text-decoration: underline;
+}

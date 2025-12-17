@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking & Payment</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="booking.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><span class="logo-orange">SafeRent</span> <span class="logo-white">Car</span></div>
+        <div class="nav-links"><a href="#">My Bookings</a><a href="#">Support</a><a href="#" class="btn-logout">Logout</a></div>
+    </nav>
+
+    <main class="container">
+        <div class="booking-card">
+            <div class="card-header"><h2>Booking Details & Payment</h2></div>
+
+            <div class="summary-section">
+                <div class="selection-details">
+                    <h3 class="section-title">Your Selection</h3>
+                    <div class="detail-row">
+                        <span class="label">Car:</span> 
+                        <span class="value" id="display-car">Loading...</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Location:</span> 
+                        <span class="value" id="display-location">Loading...</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Dates:</span> 
+                        <span class="value" id="display-dates">Loading...</span>
+                    </div>
+                </div>
+
+                <div class="price-details">
+                    <h3 class="section-title">Price Summary</h3>
+                    <div class="price-row">
+                        <span id="label-days">Rental Fee:</span>
+                        <span id="display-rental-fee">...</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Insurance:</span><span>$25.00</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Taxes & Fees:</span><span>$15.50</span>
+                    </div>
+                    <div class="price-divider"></div>
+                    <div class="price-total">
+                        <span>Total:</span>
+                        <span class="total-amount" id="display-total">...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="payment-section">
+                <h4>Payment Information</h4>
+                <div class="payment-form-box">
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <label>Country Code</label>
+                            <select class="dark-input"><option>+1</option><option>+60</option></select>
+                        </div>
+                        <div class="input-group">
+                            <label>Phone Number</label>
+                            <input type="text" class="dark-input" placeholder="123 456 7890">
+                        </div>
+                        <div class="input-group full-width">
+                            <label>Card Number</label>
+                            <input type="text" class="dark-input" placeholder="Card Number">
+                        </div>
+                        <div class="input-group"><label>MM/YY</label><input type="text" class="dark-input"></div>
+                        <div class="input-group"><label>CVC</label><input type="text" class="dark-input"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-footer">
+                <a href="car-list.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to Car List</a>
+                <button class="btn-confirm" id="btn-pay-text">Confirm & Pay</button>
+            </div>
+        </div>
+    </main>
+        <footer>
+        <p>&copy; 2025 SafeRent Car. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>
+

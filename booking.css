@@ -1,0 +1,203 @@
+/* =========================================
+   BOOKING PAGE SPECIFIC STYLES
+   ========================================= */
+
+/* Main Card Container */
+.booking-card {
+    background-color: var(--card-dark);
+    border: 1px solid #1e2636;
+    border-radius: 8px;
+    padding: 2.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+/* Header */
+.card-header {
+    border-bottom: 2px solid var(--accent-orange);
+    padding-bottom: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.card-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+/* Summary Section (2 Columns) */
+.summary-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    color: var(--accent-orange);
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+/* Left Column: Selection */
+.detail-row {
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.detail-row .label {
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-right: 0.5rem;
+}
+
+.detail-row .value {
+    color: #cbd5e1;
+}
+
+/* Right Column: Price */
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: #cbd5e1;
+}
+
+.price-divider {
+    height: 1px;
+    background-color: #334155;
+    margin: 1rem 0;
+}
+
+.price-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price-total span:first-child {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: white;
+}
+
+.total-amount {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--accent-orange);
+}
+
+/* Payment Section */
+.payment-section h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.payment-form-box {
+    background-color: #232d3f; /* Slightly lighter/blueish tone for form area */
+    border: 1px solid #374151;
+    border-radius: 6px;
+    padding: 1.5rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* Ratio for Country Code vs Phone */
+    gap: 1rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.input-group label {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-bottom: 0.4rem;
+}
+
+.dark-input {
+    background-color: var(--bg-dark); /* Darker than the box */
+    border: 1px solid #4b5563;
+    color: #e2e8f0;
+    padding: 0.7rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    outline: none;
+    width: 100%;
+}
+
+.dark-input:focus {
+    border-color: var(--accent-orange);
+}
+
+.dark-input::placeholder {
+    color: #6b7280;
+}
+
+/* Footer Actions */
+.action-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+}
+
+.back-link {
+    color: #9ca3af;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.back-link:hover {
+    color: white;
+}
+
+.btn-confirm {
+    background-color: var(--accent-orange);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-confirm:hover {
+    background-color: #a84206;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .summary-section {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-footer {
+        flex-direction: column-reverse;
+        gap: 1.5rem;
+    }
+    
+    .btn-confirm {
+        width: 100%;
+    }
+}

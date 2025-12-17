@@ -1,0 +1,162 @@
+/* =========================================
+   MY BOOKINGS PAGE STYLES
+   ========================================= */
+
+/* Header with Orange Underline */
+.bookings-header {
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--accent-orange);
+    padding-bottom: 0.8rem;
+}
+
+.bookings-header h2 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: white;
+}
+
+/* Booking Card Container */
+.bookings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+/* Individual Card */
+.booking-card {
+    background-color: var(--card-dark);
+    border: 1px solid #2d3748;
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Card Top: Title & Badge */
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.card-top h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: white;
+}
+
+.status-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-badge.active {
+    background-color: #c84e08; /* Orange bg */
+    color: white;
+}
+
+.status-badge.completed {
+    background-color: #374151; /* Gray bg */
+    color: #9ca3af;
+    border: 1px solid #4b5563;
+}
+
+/* Card Body: Info Grid */
+.card-body {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    margin-bottom: 1.5rem;
+}
+
+.car-info h4 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.detail-text {
+    font-size: 0.85rem;
+    color: #9ca3af;
+    margin-bottom: 0.3rem;
+}
+
+.price-info {
+    text-align: right;
+    font-size: 0.95rem;
+    color: #cbd5e1;
+    align-self: center; /* Vertically center */
+}
+
+/* Actions (Bottom Right) */
+.card-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    border-top: 1px solid #2d3748;
+    padding-top: 1rem;
+}
+
+.card-actions a {
+    color: #9ca3af;
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+.card-actions a:hover {
+    color: white;
+}
+
+.btn-cancel {
+    background-color: #ef4444; /* Red */
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.btn-cancel:hover { background-color: #dc2626; }
+
+.btn-receipt {
+    background-color: transparent;
+    color: #9ca3af;
+    border: none;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+.btn-receipt:hover { text-decoration: underline; color: white;}
+
+/* Back Button (Bottom Center) */
+.action-area {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-back-search {
+    background-color: #374151;
+    color: #e2e8f0;
+    text-decoration: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-back-search:hover { background-color: #4b5563; }
+
+/* Navbar Active State */
+.active-link {
+    color: white !important;
+    font-weight: 600;
+}

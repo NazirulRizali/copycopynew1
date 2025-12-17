@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - SafeRent Car</title>
+    
+    <link rel="stylesheet" href="signup.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="signup-wrapper">
+        <div class="signup-card">
+            
+            <div class="card-header">
+                <h2>Create Your Account</h2>
+                <p>Join us today and get started in seconds.</p>
+            </div>
+            
+            <form id="signup-form">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="signup-name" placeholder="e.g., John Doe" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="signup-email" placeholder="you@example.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="signup-pass" placeholder="Must be 8+ characters" required>
+                </div>
+
+                <div class="row-group">
+                    <div class="input-group small">
+                        <label>Age</label>
+                        <input type="number" id="signup-age" placeholder="18+" min="18" required>
+                    </div>
+                    <div class="input-group large">
+                        <label>Country</label>
+                        <select id="signup-country" required>
+                            <option value="" disabled selected>Select your country</option>
+                            <option value="US">United States</option>
+                            <option value="MY">Malaysia</option>
+                            <option value="UK">United Kingdom</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <label class="checkbox-container">
+                        <input type="checkbox" required>
+                        <span class="checkmark"></span>
+                        <span class="text">I agree to the <a href="#">Terms</a></span>
+                    </label>
+                    
+                    <label class="checkbox-container">
+                        <input type="checkbox">
+                        <span class="checkmark"></span>
+                        <span class="text">Remember Me</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-signup" id="btn-signup-action">Sign Up</button>
+            </form>
+
+            <div class="signup-footer">
+                <p>Already have an account? <a href="login.html">Log in</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>

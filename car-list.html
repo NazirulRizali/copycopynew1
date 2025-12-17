@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car List - SafeRent Car</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="car-list.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><span class="logo-orange">SafeRent</span> <span class="logo-white">Car</span></div>
+        <div class="nav-links">
+            <a href="#">My Bookings</a><a href="#">Support</a><a href="#" class="btn-logout">Logout</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="page-header"><h1>CAR LIST</h1></div>
+
+        <section class="car-section">
+            <h3>Economy & Compact</h3>
+            <div class="car-grid">
+                <div class="car-card">
+                    <div class="car-image-box"><span class="img-text-large">Vios</span></div>
+                    <div class="car-details">
+                        <h4>Toyota Vios</h4>
+                        <p class="price">$35 <span class="per-day">/ day</span></p>
+                        <p class="description">Fuel-efficient, perfect for city travel.</p>
+                        <button class="btn-select" data-name="Toyota Vios" data-price="35">Select</button>
+                    </div>
+                </div>
+
+                <div class="car-card">
+                    <div class="car-image-box"><span class="img-text-medium">Honda City</span></div>
+                    <div class="car-details">
+                        <h4>Honda City</h4>
+                        <p class="price">$40 <span class="per-day">/ day</span></p>
+                        <p class="description">Reliable, modern sedan.</p>
+                        <button class="btn-select" data-name="Honda City" data-price="40">Select</button>
+                    </div>
+                </div>
+
+                <div class="car-card">
+                    <div class="car-image-box"><span class="img-text-small">Hatchback</span></div>
+                    <div class="car-details">
+                        <h4>Renault Clio</h4>
+                        <p class="price">$30 <span class="per-day">/ day</span></p>
+                        <p class="description">Best budget option.</p>
+                        <button class="btn-select" data-name="Renault Clio" data-price="30">Select</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="car-section">
+            <h3>Sports & Performance</h3>
+            <div class="car-grid">
+                <div class="car-card">
+                    <div class="car-image-box"><span class="img-text-large">Mustang</span></div>
+                    <div class="car-details">
+                        <h4>Ford Mustang GT</h4>
+                        <p class="price">$120 <span class="per-day">/ day</span></p>
+                        <p class="description">High performance.</p>
+                        <button class="btn-select" data-name="Ford Mustang GT" data-price="120">Select</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="action-area">
+            <button class="btn-modify" onclick="window.location.href='index.html'">
+                <i class="fa-solid fa-circle-arrow-left"></i> Modify Search
+            </button>
+        </div>
+    </main>
+
+    <footer><p>&copy; 2025 SafeRent Car. All rights reserved.</p></footer>
+    
+    <script src="script.js"></script>
+</body>
+</html>

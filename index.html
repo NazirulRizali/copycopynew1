@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeRent Car Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><span class="logo-orange">SafeRent</span> <span class="logo-white">Car</span></div>
+        <div class="nav-links">
+            <a href="#">My Bookings</a>
+            <a href="#">Support</a>
+            <a href="#" class="btn-logout">Logout</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="search-card">
+            <h2>Find Your Perfect Ride</h2>
+            <div class="search-grid">
+                <div class="input-group full-width">
+                    <label>Pick-up Location</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="pickup-location" value="KUL (Kuala Lumpur Intl Airport)">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Pick-up Date</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="pickup-date" value="05/12/2025 10:00 AM">
+                        <i class="fa-regular fa-calendar"></i>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Drop-off Date</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="dropoff-date" value="10/12/2025 11:00 AM">
+                        <i class="fa-regular fa-calendar"></i>
+                    </div>
+                </div>
+            </div>
+            <button id="search-btn" class="btn-search">Search for Cars</button>
+        </section>
+
+        <section class="offers-section">
+            <h3>Exclusive Offers</h3>
+            <div class="divider"></div>
+            <div class="offers-grid">
+                <div class="offer-card">
+                     <div class="card-image-placeholder"><span>Economy Car</span></div>
+                     <div class="card-content"><h4>Weekend Special</h4><p>Save 20%...</p><a href="#" class="link-book">Book Now</a></div>
+                </div>
+                </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 SafeRent Car. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
