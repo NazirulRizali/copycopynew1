@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
         airports.forEach(airport => {
             L.marker([airport.lat, airport.lng], { icon: carIcon })
              .addTo(map)
-             .bindPopup(`<b>${airport.name}</b><br>Available for Pickup`);
+             .bindPopup(`<b>${airport.name}</b><br>Available for Rent`);
         });
 
         // Get User Location
