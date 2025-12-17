@@ -64,14 +64,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize Map centered on Peninsular Malaysia
         const map = L.map('dashboard-map').setView([4.2105, 101.9758], 6);
 
-        // Add Dark Mode Tiles (CartoDB Dark Matter)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        // LIGHT MODE TILES
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
             subdomains: 'abcd',
             maxZoom: 19
         }).addTo(map);
 
-        // Define Airport Locations (Peninsular Malaysia)
+        // Define Airport Locations
         const airports = [
             { name: "KLIA (KUL)", lat: 2.7456, lng: 101.7099 },
             { name: "Subang Airport (SZB)", lat: 3.1306, lng: 101.5490 },
@@ -109,7 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
                 
-                // Blue Icon for User
                 const userIcon = L.icon({
                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
                     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
