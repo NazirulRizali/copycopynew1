@@ -450,3 +450,109 @@ select#pickup-location option {
     color: white;
     padding: 10px;
 }
+
+/* =========================================
+   NEW: PAYMENT MODAL STYLES
+   ========================================= */
+
+.modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent bg */
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #1f2937; /* Dark card */
+    width: 100%;
+    max-width: 450px;
+    border-radius: 12px;
+    border: 1px solid #374151;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+    background-color: #c84e08; /* Orange Header */
+    padding: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.payment-options {
+    padding: 1rem;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    background-color: #161c27;
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #374151;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.payment-option:hover {
+    background-color: #262f40;
+    border-color: #c84e08;
+    transform: translateX(5px);
+}
+
+.pay-icon {
+    font-size: 1.5rem;
+    color: #cbd5e1;
+    width: 40px;
+    text-align: center;
+}
+
+.pay-info {
+    flex: 1;
+    margin-left: 1rem;
+}
+
+.pay-info h4 {
+    color: white;
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+}
+
+.pay-info p {
+    color: #9ca3af;
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+.pay-arrow {
+    color: #6b7280;
+}
