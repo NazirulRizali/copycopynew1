@@ -82,32 +82,49 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================
     // 2. MAP LOGIC (LIGHT MODE)
     // =========================================================
+   // =========================================================
+    // 1. DATA & MAP LOGIC (Smart Location)
+    // =========================================================
     const mapElement = document.getElementById('dashboard-map');
-    
+    const locationSelect = document.getElementById('pickup-location');
+
+    // CENTRAL LIST OF AIRPORTS
+    const airports = [
+        { name: "KLIA (Kuala Lumpur Intl)", code: "KUL", lat: 2.7456, lng: 101.7099 },
+        { name: "Subang Airport (Sultan Abdul Aziz Shah)", code: "SZB", lat: 3.1306, lng: 101.5490 },
+        { name: "Penang Intl Airport", code: "PEN", lat: 5.2971, lng: 100.2769 },
+        { name: "Langkawi Intl Airport", code: "LGK", lat: 6.3333, lng: 99.7333 },
+        { name: "Senai Intl Airport (Johor)", code: "JHB", lat: 1.6413, lng: 103.6700 },
+        { name: "Kota Bharu (Sultan Ismail Petra)", code: "KBR", lat: 6.1681, lng: 102.2936 },
+        { name: "Kuala Terengganu (Sultan Mahmud)", code: "TGG", lat: 5.3826, lng: 103.1030 },
+        { name: "Ipoh (Sultan Azlan Shah)", code: "IPH", lat: 4.5680, lng: 101.0920 },
+        { name: "Kuantan (Sultan Ahmad Shah)", code: "KUA", lat: 3.7697, lng: 103.2094 },
+        { name: "Alor Setar (Sultan Abdul Halim)", code: "AOR", lat: 6.1944, lng: 100.4008 },
+        { name: "Malacca Intl Airport", code: "MKZ", lat: 2.2656, lng: 102.2528 }
+    ];
+
+    // A. POPULATE DROPDOWN
+    if (locationSelect) {
+        locationSelect.innerHTML = '<option value="" disabled selected>Select an Airport</option>';
+        airports.forEach(ap => {
+            const option = document.createElement('option');
+            option.value = `${ap.code} (${ap.name})`;
+            option.text = `${ap.name} (${ap.code})`;
+            locationSelect.appendChild(option);
+        });
+    }
+
+    // B. INITIALIZE MAP
     if (mapElement) {
-        // Initialize Map
         const map = L.map('dashboard-map').setView([4.2105, 101.9758], 6);
 
-        // Light Tiles
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; CARTO',
             subdomains: 'abcd',
             maxZoom: 19
         }).addTo(map);
 
-        const airports = [
-            { name: "KLIA (KUL)", lat: 2.7456, lng: 101.7099 },
-            { name: "Subang (SZB)", lat: 3.1306, lng: 101.5490 },
-            { name: "Penang (PEN)", lat: 5.2971, lng: 100.2769 },
-            { name: "Langkawi (LGK)", lat: 6.3333, lng: 99.7333 },
-            { name: "Senai (JHB)", lat: 1.6413, lng: 103.6700 },
-            { name: "Kota Bharu (KBR)", lat: 6.1681, lng: 102.2936 },
-            { name: "Terengganu (TGG)", lat: 5.3826, lng: 103.1030 },
-            { name: "Ipoh (IPH)", lat: 4.5680, lng: 101.0920 },
-            { name: "Kuantan (KUA)", lat: 3.7697, lng: 103.2094 },
-            { name: "Alor Setar (AOR)", lat: 6.1944, lng: 100.4008 }
-        ];
-
+        // Add Pins for Airports
         const carIcon = L.icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -115,17 +132,47 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         airports.forEach(ap => {
-            L.marker([ap.lat, ap.lng], { icon: carIcon }).addTo(map).bindPopup(`<b>${ap.name}</b><br>Available`);
+            L.marker([ap.lat, ap.lng], { icon: carIcon })
+             .addTo(map)
+             .bindPopup(`<b>${ap.name} (${ap.code})</b><br>Available for Pickup`);
         });
 
+        // C. GEOLOCATION & AUTO-SELECT NEAREST
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(pos => {
+            navigator.geolocation.getCurrentPosition(position => {
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+
+                // 1. Show User on Map
                 const userIcon = L.icon({
                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
                     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
                     iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
                 });
-                L.marker([pos.coords.latitude, pos.coords.longitude], { icon: userIcon }).addTo(map).bindPopup("<b>You</b>").openPopup();
+                L.marker([userLat, userLng], { icon: userIcon }).addTo(map).bindPopup("<b>You are here</b>").openPopup();
+
+                // 2. Calculate Nearest Airport
+                let closestAirport = null;
+                let minDistance = Infinity;
+
+                airports.forEach(ap => {
+                    const dist = map.distance([userLat, userLng], [ap.lat, ap.lng]); // Leaflet's built-in distance function (meters)
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        closestAirport = ap;
+                    }
+                });
+
+                // 3. Auto-Select in Dropdown
+                if (closestAirport && locationSelect) {
+                    const val = `${closestAirport.code} (${closestAirport.name})`;
+                    locationSelect.value = val;
+                    // Optional: Visual cue or toast that we auto-selected
+                    console.log(`Auto-selected nearest airport: ${closestAirport.name} (${(minDistance/1000).toFixed(1)}km away)`);
+                }
+
+            }, error => {
+                console.log("Geolocation denied. Defaulting to first option or none.");
             });
         }
     }
