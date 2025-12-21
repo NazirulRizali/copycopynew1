@@ -64,13 +64,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // Summary
         doc.setFontSize(14); doc.text("Payment Summary", 20, 130);
         doc.setFontSize(10);
-        doc.text(`Rental Fee (${diffDays} days):`, 20, 140); doc.text(`$${rentalFee.toFixed(2)}`, 190, 140, { align: "right" });
-        doc.text("Insurance:", 20, 150); doc.text(`$${insurance.toFixed(2)}`, 190, 150, { align: "right" });
-        doc.text("Taxes & Fees:", 20, 160); doc.text(`$${taxes.toFixed(2)}`, 190, 160, { align: "right" });
+        doc.text(`Rental Fee (${diffDays} days):`, 20, 140); doc.text(`RM${rentalFee.toFixed(2)}`, 190, 140, { align: "right" });
+        doc.text("Insurance:", 20, 150); doc.text(`RM${insurance.toFixed(2)}`, 190, 150, { align: "right" });
+        doc.text("Taxes & Fees:", 20, 160); doc.text(`RM${taxes.toFixed(2)}`, 190, 160, { align: "right" });
         
         doc.setFontSize(12); doc.setFont("helvetica", "bold");
         doc.text("TOTAL PAID:", 20, 180);
-        doc.setTextColor(200, 78, 8); doc.text(`$${booking.totalPrice}`, 190, 180, { align: "right" });
+        doc.setTextColor(200, 78, 8); doc.text(`RM${booking.totalPrice}`, 190, 180, { align: "right" });
 
         // Footer
         doc.setTextColor(150, 150, 150); doc.setFontSize(10); doc.setFont("helvetica", "normal");
