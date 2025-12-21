@@ -236,10 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =========================================================
-    // 4. BOOKING FLOW (MODIFIED FOR PAYMENT MODAL)
+    // 4. BOOKING FLOW (MODIFIED FOR SELECT -> PAY)
     // =========================================================
 
-    // Dashboard Search
+    // Search & Select Car Logic (Keep existing)
     const searchBtn = document.getElementById('search-btn');
     if (searchBtn) {
         searchBtn.addEventListener('click', (e) => {
@@ -251,7 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Select Car
     document.querySelectorAll('.btn-select').forEach(button => {
         button.addEventListener('click', function() {
             sessionStorage.setItem('selectedCarName', this.getAttribute('data-name'));
@@ -260,10 +259,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Booking Page Logic
+    // --- BOOKING PAGE LOGIC ---
     const bookingSummary = document.querySelector('.booking-card');
     if (bookingSummary) {
-        // 1. Calculate and Display
         const location = sessionStorage.getItem('rentalLocation') || "Kuala Lumpur Intl Airport (KUL)";
         const pickupStr = sessionStorage.getItem('pickupDate') || "05/12/2025 10:00 AM";
         const dropoffStr = sessionStorage.getItem('dropoffDate') || "10/12/2025 11:00 AM";
@@ -287,30 +285,50 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('display-rental-fee').textContent = `RM${rentalFee.toFixed(2)}`;
         document.getElementById('display-total').textContent = `RM${total.toFixed(2)}`;
         
+        // "Confirm & Pay" Button on Main Page
         const payBtn = document.getElementById('btn-pay-text');
         payBtn.textContent = `Confirm & Pay RM${total.toFixed(2)}`;
 
-        // 2. MODAL LOGIC: Show Modal on Click
+        // Modal Elements
         const modal = document.getElementById('payment-modal');
         const closeModal = document.getElementById('close-modal');
+        const finalPayBtn = document.getElementById('btn-final-pay');
+        let selectedMethod = null; // Store user choice
 
+        // 1. Open Modal
         payBtn.addEventListener('click', () => {
-             // Basic Check if logged in
              if (!auth.currentUser) { alert("Please login first."); return; }
-             // Show Modal
              modal.style.display = 'flex';
         });
 
-        // Close Modal Logic
         closeModal.addEventListener('click', () => { modal.style.display = 'none'; });
         window.addEventListener('click', (e) => { if (e.target == modal) modal.style.display = 'none'; });
 
-        // 3. CONFIRM PAYMENT FUNCTION (Global scope to be called by HTML onclick)
-        window.confirmPayment = function(methodName) {
+        // 2. Handle Selection (Clicking an option)
+        window.selectPayment = function(element, method) {
+            // Remove 'selected' class from all options
+            document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
+            
+            // Add 'selected' to clicked element
+            element.classList.add('selected');
+            
+            // Save selection and enable button
+            selectedMethod = method;
+            finalPayBtn.disabled = false;
+            finalPayBtn.textContent = `Pay RM${total.toFixed(2)}`;
+            finalPayBtn.style.cursor = "pointer";
+        };
+
+        // 3. Final Pay Button Click
+        finalPayBtn.addEventListener('click', () => {
+            if (!selectedMethod) return;
+
             const user = auth.currentUser;
             const phoneInput = document.querySelector('.payment-form-box input[placeholder="123 456 7890"]');
             
-            // Create Booking Object
+            finalPayBtn.textContent = "Processing...";
+            finalPayBtn.disabled = true;
+
             const newBooking = {
                 carName: carName, 
                 location: location, 
@@ -318,25 +336,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalPrice: total.toFixed(2), 
                 phone: phoneInput ? phoneInput.value : "",
                 status: "Active", 
-                paymentMethod: methodName, // Save the method
+                paymentMethod: selectedMethod,
                 createdAt: new Date()
             };
 
-            // Save to Firebase
             db.collection("users").doc(user.uid).collection("bookings").add(newBooking)
             .then((docRef) => {
-                // Generate PDF
                 newBooking.id = docRef.id.substring(0, 8).toUpperCase();
-                generateDetailedPDF(newBooking, diffDays, rentalFee, insurance, taxes, newBooking.phone, methodName);
+                generateDetailedPDF(newBooking, diffDays, rentalFee, insurance, taxes, newBooking.phone, selectedMethod);
                 
-                // Hide Modal
                 modal.style.display = 'none';
-                
-                // Redirect
                 setTimeout(() => { window.location.href = 'my-bookings.html'; }, 1000);
             })
-            .catch((err) => alert("Booking failed: " + err.message));
-        };
+            .catch((err) => {
+                alert("Booking failed: " + err.message);
+                finalPayBtn.textContent = "Pay Now";
+                finalPayBtn.disabled = false;
+            });
+        });
     }
 
     // =========================================================
