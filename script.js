@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setFontSize(14); doc.text("Payment Summary", 20, 130);
         doc.setFontSize(10);
         doc.text(`Rental Fee (${diffDays} days):`, 20, 140); doc.text(`RM${rentalFee.toFixed(2)}`, 190, 140, { align: "right" });
-        doc.text("Insurance:", 20, 150); doc.text(`RM${insurance.toFixed(2)}`, 190, 150, { align: "right" });
+        doc.text("Insurance:", 20, 150); doc.text(`RMRM{insurance.toFixed(2)}`, 190, 150, { align: "right" });
         doc.text("Taxes & Fees:", 20, 160); doc.text(`RM${taxes.toFixed(2)}`, 190, 160, { align: "right" });
         
         doc.setFontSize(12); doc.setFont("helvetica", "bold");
