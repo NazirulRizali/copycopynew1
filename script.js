@@ -85,10 +85,13 @@ document.addEventListener('DOMContentLoaded', () => {
    // =========================================================
     // 1. DATA & MAP LOGIC (Smart Location)
     // =========================================================
+    // =========================================================
+    // 1. DATA & MAP LOGIC
+    // =========================================================
     const mapElement = document.getElementById('dashboard-map');
     const locationSelect = document.getElementById('pickup-location');
 
-    // CENTRAL LIST OF AIRPORTS
+    // AIRPORT DATA
     const airports = [
         { name: "KLIA (Kuala Lumpur Intl)", code: "KUL", lat: 2.7456, lng: 101.7099 },
         { name: "Subang Airport (Sultan Abdul Aziz Shah)", code: "SZB", lat: 3.1306, lng: 101.5490 },
@@ -103,18 +106,21 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Malacca Intl Airport", code: "MKZ", lat: 2.2656, lng: 102.2528 }
     ];
 
-    // A. POPULATE DROPDOWN
+    // A. POPULATE DROPDOWN (Manual Select Only)
     if (locationSelect) {
-        locationSelect.innerHTML = '<option value="" disabled selected>Select an Airport</option>';
+        // Reset to default
+        locationSelect.innerHTML = '<option value="" disabled selected>Select Pick-up Location</option>';
+        
         airports.forEach(ap => {
             const option = document.createElement('option');
-            option.value = `${ap.code} (${ap.name})`;
+            // Store simple name for the booking display
+            option.value = `${ap.code} (${ap.name})`; 
             option.text = `${ap.name} (${ap.code})`;
             locationSelect.appendChild(option);
         });
     }
 
-    // B. INITIALIZE MAP
+    // B. INITIALIZE MAP (Just showing the map, no auto-select)
     if (mapElement) {
         const map = L.map('dashboard-map').setView([4.2105, 101.9758], 6);
 
@@ -124,7 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
             maxZoom: 19
         }).addTo(map);
 
-        // Add Pins for Airports
         const carIcon = L.icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -137,43 +142,16 @@ document.addEventListener('DOMContentLoaded', () => {
              .bindPopup(`<b>${ap.name} (${ap.code})</b><br>Available for Pickup`);
         });
 
-        // C. GEOLOCATION & AUTO-SELECT NEAREST
+        // Optional: Show user location on map visually, but DO NOT affect the dropdown
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(position => {
-                const userLat = position.coords.latitude;
-                const userLng = position.coords.longitude;
-
-                // 1. Show User on Map
                 const userIcon = L.icon({
                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
                     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
                     iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
                 });
-                L.marker([userLat, userLng], { icon: userIcon }).addTo(map).bindPopup("<b>You are here</b>").openPopup();
-
-                // 2. Calculate Nearest Airport
-                let closestAirport = null;
-                let minDistance = Infinity;
-
-                airports.forEach(ap => {
-                    const dist = map.distance([userLat, userLng], [ap.lat, ap.lng]); // Leaflet's built-in distance function (meters)
-                    if (dist < minDistance) {
-                        minDistance = dist;
-                        closestAirport = ap;
-                    }
-                });
-
-                // 3. Auto-Select in Dropdown
-                if (closestAirport && locationSelect) {
-                    const val = `${closestAirport.code} (${closestAirport.name})`;
-                    locationSelect.value = val;
-                    // Optional: Visual cue or toast that we auto-selected
-                    console.log(`Auto-selected nearest airport: ${closestAirport.name} (${(minDistance/1000).toFixed(1)}km away)`);
-                }
-
-            }, error => {
-                console.log("Geolocation denied. Defaulting to first option or none.");
-            });
+                L.marker([position.coords.latitude, position.coords.longitude], { icon: userIcon }).addTo(map).bindPopup("<b>You</b>");
+            }, () => console.log("Geo denied"));
         }
     }
 
