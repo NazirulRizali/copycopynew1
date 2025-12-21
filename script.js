@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - FINAL VERSION (Currency: RM)
+   script.js - FIXED LOCATION ISSUE
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return new Date(year, month - 1, day, hours, minutes);
     }
 
-    // PDF Generator (Updated to RM)
+    // PDF Generator
     function generateDetailedPDF(booking, diffDays, rentalFee, insurance, taxes, phone) {
         const { jsPDF } = window.jspdf;
         if (!jsPDF) return;
@@ -44,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Summary
         doc.setFontSize(14); doc.text("Payment Summary", 20, 130);
         doc.setFontSize(10);
-        // CHANGED TO RM
         doc.text(`Rental Fee (${diffDays} days):`, 20, 140); doc.text(`RM${rentalFee.toFixed(2)}`, 190, 140, { align: "right" });
         doc.text("Insurance:", 20, 150); doc.text(`RM${insurance.toFixed(2)}`, 190, 150, { align: "right" });
         doc.text("Taxes & Fees:", 20, 160); doc.text(`RM${taxes.toFixed(2)}`, 190, 160, { align: "right" });
@@ -52,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setFontSize(12); doc.setFont("helvetica", "bold");
         doc.text("TOTAL PAID:", 20, 180);
         doc.setTextColor(200, 78, 8); 
-        // CHANGED TO RM
         doc.text(`RM${booking.totalPrice}`, 190, 180, { align: "right" });
 
         // Footer
@@ -81,23 +79,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
 
     // =========================================================
-    // 1. MAP LOGIC
+    // 1. MAP & LOCATION LOGIC (FIXED AIRPORT DATA)
     // =========================================================
     const mapElement = document.getElementById('dashboard-map');
     const locationSelect = document.getElementById('pickup-location');
 
+    // FIXED: All airports now have a 'code' property
     const airports = [
         { name: "KLIA (Kuala Lumpur Intl)", code: "KUL", lat: 2.7456, lng: 101.7099 },
-        { name: "Subang (SZB)", lat: 3.1306, lng: 101.5490 },
-        { name: "Penang (PEN)", lat: 5.2971, lng: 100.2769 },
-        { name: "Langkawi (LGK)", lat: 6.3333, lng: 99.7333 },
-        { name: "Senai (JHB)", lat: 1.6413, lng: 103.6700 },
-        { name: "Kota Bharu (KBR)", lat: 6.1681, lng: 102.2936 },
-        { name: "Terengganu (TGG)", lat: 5.3826, lng: 103.1030 },
-        { name: "Ipoh (IPH)", lat: 4.5680, lng: 101.0920 },
-        { name: "Kuantan (KUA)", lat: 3.7697, lng: 103.2094 },
-        { name: "Alor Setar (AOR)", lat: 6.1944, lng: 100.4008 },
-        { name: "Malacca (MKZ)", lat: 2.2656, lng: 102.2528 }
+        { name: "Subang Airport", code: "SZB", lat: 3.1306, lng: 101.5490 },
+        { name: "Penang Intl Airport", code: "PEN", lat: 5.2971, lng: 100.2769 },
+        { name: "Langkawi Intl Airport", code: "LGK", lat: 6.3333, lng: 99.7333 },
+        { name: "Senai Intl Airport", code: "JHB", lat: 1.6413, lng: 103.6700 },
+        { name: "Kota Bharu Airport", code: "KBR", lat: 6.1681, lng: 102.2936 },
+        { name: "Kuala Terengganu Airport", code: "TGG", lat: 5.3826, lng: 103.1030 },
+        { name: "Ipoh Airport", code: "IPH", lat: 4.5680, lng: 101.0920 },
+        { name: "Kuantan Airport", code: "KUA", lat: 3.7697, lng: 103.2094 },
+        { name: "Alor Setar Airport", code: "AOR", lat: 6.1944, lng: 100.4008 },
+        { name: "Malacca Intl Airport", code: "MKZ", lat: 2.2656, lng: 102.2528 }
     ];
 
     // Populate Dropdown
@@ -105,7 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
         locationSelect.innerHTML = '<option value="" disabled selected>Select Pick-up Location</option>';
         airports.forEach(ap => {
             const option = document.createElement('option');
-            option.value = `${ap.code} (${ap.name})`; 
+            // This line was causing the issue - now it's fixed because 'ap.code' exists
+            option.value = `${ap.name} (${ap.code})`; 
             option.text = `${ap.name} (${ap.code})`;
             locationSelect.appendChild(option);
         });
@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const bookingSummary = document.querySelector('.booking-card');
     if (bookingSummary) {
-        const location = sessionStorage.getItem('rentalLocation') || "KUL";
+        const location = sessionStorage.getItem('rentalLocation') || "KLIA (KUL)";
         const pickupStr = sessionStorage.getItem('pickupDate') || "05/12/2025 10:00 AM";
         const dropoffStr = sessionStorage.getItem('dropoffDate') || "10/12/2025 11:00 AM";
         const carName = sessionStorage.getItem('selectedCarName') || "Toyota Vios";
@@ -289,12 +289,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('display-location').textContent = location;
         document.getElementById('display-dates').textContent = `${formatD(date1)} to ${formatD(date2)}`;
         document.getElementById('label-days').textContent = `Rental Fee (${diffDays} days):`;
-        // CHANGED TO RM
         document.getElementById('display-rental-fee').textContent = `RM${rentalFee.toFixed(2)}`;
         document.getElementById('display-total').textContent = `RM${total.toFixed(2)}`;
         
         const payBtn = document.getElementById('btn-pay-text');
-        // CHANGED TO RM
         payBtn.textContent = `Confirm & Pay RM${total.toFixed(2)}`;
 
         payBtn.addEventListener('click', () => {
@@ -389,10 +387,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
             
-            // Re-download PDF logic for past bookings
+            // Re-download PDF logic
             document.querySelectorAll('.btn-receipt').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    // (You can add the re-download logic here if needed, simplified for now)
                     alert("Receipt download started...");
                 });
             });
