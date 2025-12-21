@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - FIXED LOCATION ISSUE
+   script.js - FIXED "UNDEFINED" LOCATION ISSUE
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -79,14 +79,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
 
     // =========================================================
-    // 1. MAP & LOCATION LOGIC (FIXED AIRPORT DATA)
+    // 1. MAP & LOCATION LOGIC (CLEANED DATA)
     // =========================================================
     const mapElement = document.getElementById('dashboard-map');
     const locationSelect = document.getElementById('pickup-location');
 
-    // FIXED: All airports now have a 'code' property
+    // FIXED AIRPORT DATA: 
+    // Removed old confusing names like "Subang (SZB)" to just "Subang Airport"
+    // so we can build the string cleanly ourselves.
     const airports = [
-        { name: "KLIA (Kuala Lumpur Intl)", code: "KUL", lat: 2.7456, lng: 101.7099 },
+        { name: "Kuala Lumpur Intl Airport", code: "KUL", lat: 2.7456, lng: 101.7099 },
         { name: "Subang Airport", code: "SZB", lat: 3.1306, lng: 101.5490 },
         { name: "Penang Intl Airport", code: "PEN", lat: 5.2971, lng: 100.2769 },
         { name: "Langkawi Intl Airport", code: "LGK", lat: 6.3333, lng: 99.7333 },
@@ -104,9 +106,11 @@ document.addEventListener('DOMContentLoaded', () => {
         locationSelect.innerHTML = '<option value="" disabled selected>Select Pick-up Location</option>';
         airports.forEach(ap => {
             const option = document.createElement('option');
-            // This line was causing the issue - now it's fixed because 'ap.code' exists
-            option.value = `${ap.name} (${ap.code})`; 
-            option.text = `${ap.name} (${ap.code})`;
+            // CLEAN STRING BUILDING: Name + (Code)
+            // Example: "Subang Airport (SZB)"
+            const cleanName = `${ap.name} (${ap.code})`;
+            option.value = cleanName; 
+            option.text = cleanName;
             locationSelect.appendChild(option);
         });
     }
@@ -269,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const bookingSummary = document.querySelector('.booking-card');
     if (bookingSummary) {
-        const location = sessionStorage.getItem('rentalLocation') || "KLIA (KUL)";
+        const location = sessionStorage.getItem('rentalLocation') || "Kuala Lumpur Intl Airport (KUL)";
         const pickupStr = sessionStorage.getItem('pickupDate') || "05/12/2025 10:00 AM";
         const dropoffStr = sessionStorage.getItem('dropoffDate') || "10/12/2025 11:00 AM";
         const carName = sessionStorage.getItem('selectedCarName') || "Toyota Vios";
