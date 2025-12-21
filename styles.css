@@ -452,7 +452,7 @@ select#pickup-location option {
 }
 
 /* =========================================
-   NEW: PAYMENT MODAL STYLES
+   PAYMENT MODAL STYLES (COMPLETE)
    ========================================= */
 
 .modal-overlay {
@@ -462,14 +462,14 @@ select#pickup-location option {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent bg */
+    background-color: rgba(0, 0, 0, 0.7);
     z-index: 1000;
     justify-content: center;
     align-items: center;
 }
 
 .modal-content {
-    background-color: #1f2937; /* Dark card */
+    background-color: #1f2937;
     width: 100%;
     max-width: 450px;
     border-radius: 12px;
@@ -477,6 +477,8 @@ select#pickup-location option {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     overflow: hidden;
     animation: slideUp 0.3s ease-out;
+    display: flex;       /* Added for footer layout */
+    flex-direction: column;
 }
 
 @keyframes slideUp {
@@ -485,7 +487,7 @@ select#pickup-location option {
 }
 
 .modal-header {
-    background-color: #c84e08; /* Orange Header */
+    background-color: #c84e08;
     padding: 1.2rem;
     display: flex;
     justify-content: space-between;
@@ -526,7 +528,17 @@ select#pickup-location option {
 .payment-option:hover {
     background-color: #262f40;
     border-color: #c84e08;
-    transform: translateX(5px);
+}
+
+/* Highlight Selected Option */
+.payment-option.selected {
+    border: 2px solid #c84e08;
+    background-color: #262f40;
+}
+
+.payment-option.selected .check-icon {
+    color: #c84e08;
+    opacity: 1;
 }
 
 .pay-icon {
@@ -553,6 +565,40 @@ select#pickup-location option {
     margin: 0;
 }
 
-.pay-arrow {
-    color: #6b7280;
+.check-icon {
+    color: #374151;
+    opacity: 0.5;
+    font-size: 1.2rem;
+    transition: color 0.2s;
+}
+
+/* Modal Footer & Pay Button */
+.modal-footer {
+    padding: 1rem 1.2rem 1.5rem 1.2rem;
+    border-top: 1px solid #374151;
+    background-color: #1f2937;
+}
+
+.btn-pay-modal {
+    width: 100%;
+    background-color: #c84e08;
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-pay-modal:hover {
+    background-color: #a84206;
+}
+
+/* Disabled State (Grayed out) */
+.btn-pay-modal:disabled {
+    background-color: #4b5563;
+    cursor: not-allowed;
+    opacity: 0.7;
 }
