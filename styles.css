@@ -1,4 +1,6 @@
-/* Reset & Base Styles */
+/* =========================================
+   1. RESET & BASE STYLES
+   ========================================= */
 * {
     margin: 0;
     padding: 0;
@@ -24,7 +26,9 @@ body {
     flex-direction: column;
 }
 
-/* Navbar */
+/* =========================================
+   2. NAVBAR
+   ========================================= */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -75,7 +79,9 @@ body {
     background-color: #a84206;
 }
 
-/* Main Container */
+/* =========================================
+   3. MAIN CONTAINER & DASHBOARD
+   ========================================= */
 .container {
     max-width: 1000px;
     margin: 0 auto;
@@ -83,7 +89,6 @@ body {
     flex: 1;
 }
 
-/* Search Card */
 .search-card {
     background-color: var(--card-dark);
     padding: 2.5rem;
@@ -119,6 +124,7 @@ body {
     align-items: center;
 }
 
+/* Standard Inputs */
 .input-wrapper input {
     width: 100%;
     background-color: #262f40;
@@ -158,7 +164,9 @@ body {
     background-color: #a84206;
 }
 
-/* Offers Section */
+/* =========================================
+   4. OFFERS SECTION
+   ========================================= */
 .offers-section {
     margin-top: 2rem;
 }
@@ -216,12 +224,12 @@ body {
     font-size: 0.85rem;
     line-height: 1.4;
     margin-bottom: 1.5rem;
-    min-height: 2.5rem; /* Keeps cards aligned */
+    min-height: 2.5rem;
 }
 
 .link-book {
     text-decoration: none;
-    color: #e67e22; /* Slightly lighter orange for links */
+    color: #e67e22;
     font-size: 0.9rem;
     font-weight: 600;
     display: flex;
@@ -234,7 +242,9 @@ body {
     color: #f39c12;
 }
 
-/* Footer */
+/* =========================================
+   5. FOOTER
+   ========================================= */
 footer {
     border-top: 1px solid #1f2937;
     padding: 2rem;
@@ -263,12 +273,9 @@ footer a {
     }
 }
 
-/* ... Previous Styles ... */
-
 /* =========================================
-   NEW: MAP SECTION STYLES
+   6. MAP SECTION STYLES
    ========================================= */
-
 .map-section {
     margin-bottom: 3rem;
 }
@@ -284,11 +291,11 @@ footer a {
 }
 
 #dashboard-map {
-    height: 400px; /* Height of the mini map */
+    height: 400px;
     width: 100%;
     border-radius: 8px;
     border: 1px solid #374151;
-    z-index: 1; /* Ensure it sits correctly */
+    z-index: 1;
 }
 
 /* Custom Popup Styles for Map */
@@ -305,30 +312,26 @@ footer a {
 }
 
 /* =========================================
-   CUSTOM FLATPICKR STYLE (Side-by-Side)
+   7. CUSTOM FLATPICKR STYLE (Side-by-Side)
    ========================================= */
 
-/* 1. Make the container wide enough for side-by-side */
 .flatpickr-calendar {
-    width: 480px !important; /* Increase width */
+    width: 480px !important;
     padding: 10px;
 }
 
-/* 2. Flex container to put Calendar & Time side-by-side */
 .flatpickr-innerContainer {
     display: flex;
     flex-direction: row;
 }
 
-/* 3. Adjust the Days container width */
 .flatpickr-rContainer {
     display: inline-block;
-    width: 310px; /* Standard calendar width */
-    border-right: 1px solid #e6e6e6; /* Separator line */
+    width: 310px;
+    border-right: 1px solid #e6e6e6;
     padding-right: 10px;
 }
 
-/* 4. Style the Time Picker to sit on the right */
 .flatpickr-time {
     display: flex !important;
     flex-direction: column;
@@ -339,14 +342,12 @@ footer a {
     padding-left: 10px;
 }
 
-/* 5. Custom Blue Headers for Time (Hour/Min/AMPM) */
 .flatpickr-time .flatpickr-time-separator,
 .flatpickr-time .numInputWrapper {
     color: #333;
     font-weight: bold;
 }
 
-/* Blue background for the time inputs like the photo */
 .flatpickr-time input.flatpickr-hour, 
 .flatpickr-time input.flatpickr-minute,
 .flatpickr-time .flatpickr-am-pm {
@@ -362,20 +363,6 @@ footer a {
     background: #0056b3;
 }
 
-/* Labels (HR, MIN, AM/PM) - simulating headers */
-.time-label-header {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    color: white;
-    background: #007bff;
-    padding: 5px;
-    border-radius: 4px 4px 0 0;
-    margin-bottom: 5px;
-    text-align: center;
-}
-
-/* 6. Footer Buttons (Clear / Today) */
 .flatpickr-footer {
     display: flex;
     justify-content: space-between;
@@ -394,4 +381,37 @@ footer a {
 }
 .flatpickr-btn:hover {
     text-decoration: underline;
+}
+
+/* =========================================
+   8. NEW: AIRPORT DROPDOWN STYLES
+   ========================================= */
+
+/* Dropdown styling to match existing inputs */
+select.dark-input {
+    width: 100%;
+    background-color: #262f40; /* Input background color */
+    border: 1px solid #4b5563;
+    color: #e2e8f0;
+    padding: 0.8rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    outline: none;
+    appearance: none; /* Removes standard arrow for cleaner look */
+    cursor: pointer;
+    /* Adding a custom arrow here since appearance:none removes it */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+}
+
+select.dark-input:focus {
+    border-color: var(--accent-orange);
+}
+
+/* Ensure options have dark background (mostly for Windows/Android) */
+select.dark-input option {
+    background-color: #262f40;
+    color: white;
 }
