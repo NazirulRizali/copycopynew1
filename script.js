@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - WITH PAYMENT MODAL (RM)
+   script.js - FINAL VERSION (Login Check + Payment Modal)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text("Location:", 20, 80); doc.text(booking.location, 90, 80);
         doc.text("Pick-up / Drop-off:", 20, 90); doc.text(`${booking.dateRange} (${diffDays} days)`, 90, 90);
         doc.text("Contact Number:", 20, 100); doc.text(phone || "N/A", 90, 100);
-        // Add Payment Method to PDF
         doc.text("Payment Method:", 20, 110); doc.text(method || "Credit Card", 90, 110);
         
         doc.setLineWidth(0.5); doc.line(20, 120, 190, 120);
@@ -206,6 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 auth.signInWithEmailAndPassword(email, pass)
                     .then((userCredential) => {
                         if (userCredential.user.emailVerified) {
+                            // If coming from login page, go home
                             window.location.href = 'index.html';
                         } else {
                             alert("Please verify your email first.");
@@ -229,17 +229,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             if (path.includes('login')) window.location.href = 'index.html';
         } else {
-            if (!isPublic && (path.includes('booking') || path.includes('my-bookings'))) {
+            // CHANGED: Removed 'booking' from strict redirect so guests can view price
+            if (!isPublic && path.includes('my-bookings')) {
                 window.location.href = 'login.html';
             }
         }
     });
 
     // =========================================================
-    // 4. BOOKING FLOW (MODIFIED FOR SELECT -> PAY)
+    // 4. BOOKING FLOW (MODAL PAYMENT)
     // =========================================================
 
-    // Search & Select Car Logic (Keep existing)
+    // Search & Select Car Logic
     const searchBtn = document.getElementById('search-btn');
     if (searchBtn) {
         searchBtn.addEventListener('click', (e) => {
@@ -285,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('display-rental-fee').textContent = `RM${rentalFee.toFixed(2)}`;
         document.getElementById('display-total').textContent = `RM${total.toFixed(2)}`;
         
-        // "Confirm & Pay" Button on Main Page
+        // "Confirm & Pay" Button
         const payBtn = document.getElementById('btn-pay-text');
         payBtn.textContent = `Confirm & Pay RM${total.toFixed(2)}`;
 
@@ -293,33 +294,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const modal = document.getElementById('payment-modal');
         const closeModal = document.getElementById('close-modal');
         const finalPayBtn = document.getElementById('btn-final-pay');
-        let selectedMethod = null; // Store user choice
+        let selectedMethod = null;
 
-        // 1. Open Modal
+        // 1. OPEN MODAL (Check Login First)
         payBtn.addEventListener('click', () => {
-             if (!auth.currentUser) { alert("Please login first."); return; }
+             if (!auth.currentUser) { 
+                 alert("You must log in first to complete your booking.\n\nRedirecting you to Login page...");
+                 window.location.href = 'login.html';
+                 return; 
+             }
              modal.style.display = 'flex';
         });
 
         closeModal.addEventListener('click', () => { modal.style.display = 'none'; });
         window.addEventListener('click', (e) => { if (e.target == modal) modal.style.display = 'none'; });
 
-        // 2. Handle Selection (Clicking an option)
+        // 2. SELECT PAYMENT METHOD
         window.selectPayment = function(element, method) {
-            // Remove 'selected' class from all options
             document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
-            
-            // Add 'selected' to clicked element
             element.classList.add('selected');
-            
-            // Save selection and enable button
             selectedMethod = method;
             finalPayBtn.disabled = false;
             finalPayBtn.textContent = `Pay RM${total.toFixed(2)}`;
             finalPayBtn.style.cursor = "pointer";
         };
 
-        // 3. Final Pay Button Click
+        // 3. FINAL PAY BUTTON
         finalPayBtn.addEventListener('click', () => {
             if (!selectedMethod) return;
 
