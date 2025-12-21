@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - FIXED "UNDEFINED" LOCATION ISSUE
+   script.js - WITH PAYMENT MODAL (RM)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // PDF Generator
-    function generateDetailedPDF(booking, diffDays, rentalFee, insurance, taxes, phone) {
+    function generateDetailedPDF(booking, diffDays, rentalFee, insurance, taxes, phone, method) {
         const { jsPDF } = window.jspdf;
         if (!jsPDF) return;
         const doc = new jsPDF();
@@ -38,20 +38,22 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text("Location:", 20, 80); doc.text(booking.location, 90, 80);
         doc.text("Pick-up / Drop-off:", 20, 90); doc.text(`${booking.dateRange} (${diffDays} days)`, 90, 90);
         doc.text("Contact Number:", 20, 100); doc.text(phone || "N/A", 90, 100);
+        // Add Payment Method to PDF
+        doc.text("Payment Method:", 20, 110); doc.text(method || "Credit Card", 90, 110);
         
-        doc.setLineWidth(0.5); doc.line(20, 110, 190, 110);
+        doc.setLineWidth(0.5); doc.line(20, 120, 190, 120);
         
         // Summary
-        doc.setFontSize(14); doc.text("Payment Summary", 20, 130);
+        doc.setFontSize(14); doc.text("Payment Summary", 20, 140);
         doc.setFontSize(10);
-        doc.text(`Rental Fee (${diffDays} days):`, 20, 140); doc.text(`RM${rentalFee.toFixed(2)}`, 190, 140, { align: "right" });
-        doc.text("Insurance:", 20, 150); doc.text(`RM${insurance.toFixed(2)}`, 190, 150, { align: "right" });
-        doc.text("Taxes & Fees:", 20, 160); doc.text(`RM${taxes.toFixed(2)}`, 190, 160, { align: "right" });
+        doc.text(`Rental Fee (${diffDays} days):`, 20, 150); doc.text(`RM${rentalFee.toFixed(2)}`, 190, 150, { align: "right" });
+        doc.text("Insurance:", 20, 160); doc.text(`RM${insurance.toFixed(2)}`, 190, 160, { align: "right" });
+        doc.text("Taxes & Fees:", 20, 170); doc.text(`RM${taxes.toFixed(2)}`, 190, 170, { align: "right" });
         
         doc.setFontSize(12); doc.setFont("helvetica", "bold");
-        doc.text("TOTAL PAID:", 20, 180);
+        doc.text("TOTAL PAID:", 20, 190);
         doc.setTextColor(200, 78, 8); 
-        doc.text(`RM${booking.totalPrice}`, 190, 180, { align: "right" });
+        doc.text(`RM${booking.totalPrice}`, 190, 190, { align: "right" });
 
         // Footer
         doc.setTextColor(150, 150, 150); doc.setFontSize(10); doc.setFont("helvetica", "normal");
@@ -79,14 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
 
     // =========================================================
-    // 1. MAP & LOCATION LOGIC (CLEANED DATA)
+    // 1. MAP & LOCATION LOGIC
     // =========================================================
     const mapElement = document.getElementById('dashboard-map');
     const locationSelect = document.getElementById('pickup-location');
 
-    // FIXED AIRPORT DATA: 
-    // Removed old confusing names like "Subang (SZB)" to just "Subang Airport"
-    // so we can build the string cleanly ourselves.
     const airports = [
         { name: "Kuala Lumpur Intl Airport", code: "KUL", lat: 2.7456, lng: 101.7099 },
         { name: "Subang Airport", code: "SZB", lat: 3.1306, lng: 101.5490 },
@@ -101,21 +100,16 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Malacca Intl Airport", code: "MKZ", lat: 2.2656, lng: 102.2528 }
     ];
 
-    // Populate Dropdown
     if (locationSelect) {
         locationSelect.innerHTML = '<option value="" disabled selected>Select Pick-up Location</option>';
         airports.forEach(ap => {
-            const option = document.createElement('option');
-            // CLEAN STRING BUILDING: Name + (Code)
-            // Example: "Subang Airport (SZB)"
             const cleanName = `${ap.name} (${ap.code})`;
-            option.value = cleanName; 
-            option.text = cleanName;
+            const option = document.createElement('option');
+            option.value = cleanName; option.text = cleanName;
             locationSelect.appendChild(option);
         });
     }
 
-    // Initialize Map
     if (mapElement) {
         const map = L.map('dashboard-map').setView([4.2105, 101.9758], 6);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -145,30 +139,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================
-    // 2. CUSTOM CALENDAR (FLATPICKR)
+    // 2. CUSTOM CALENDAR
     // =========================================================
     if (document.getElementById("pickup-date")) {
         const datePickerConfig = {
-            enableTime: true,
-            dateFormat: "d/m/Y h:i K",
-            time_24hr: false,
-            defaultHour: 10,
+            enableTime: true, dateFormat: "d/m/Y h:i K", time_24hr: false, defaultHour: 10,
             onReady: function(selectedDates, dateStr, instance) {
                 const footer = document.createElement("div");
                 footer.classList.add("flatpickr-footer");
                 
                 const clearBtn = document.createElement("button");
-                clearBtn.innerText = "Clear";
-                clearBtn.classList.add("flatpickr-btn");
+                clearBtn.innerText = "Clear"; clearBtn.classList.add("flatpickr-btn");
                 clearBtn.addEventListener("click", () => { instance.clear(); instance.close(); });
 
                 const todayBtn = document.createElement("button");
-                todayBtn.innerText = "Today";
-                todayBtn.classList.add("flatpickr-btn");
+                todayBtn.innerText = "Today"; todayBtn.classList.add("flatpickr-btn");
                 todayBtn.addEventListener("click", () => { instance.setDate(new Date()); });
 
-                footer.appendChild(clearBtn);
-                footer.appendChild(todayBtn);
+                footer.appendChild(clearBtn); footer.appendChild(todayBtn);
                 instance.calendarContainer.appendChild(footer);
             }
         };
@@ -238,7 +226,6 @@ document.addEventListener('DOMContentLoaded', () => {
     auth.onAuthStateChanged((user) => {
         const path = window.location.pathname;
         const isPublic = path.includes('login') || path.includes('signup') || path.includes('verify');
-
         if (user) {
             if (path.includes('login')) window.location.href = 'index.html';
         } else {
@@ -249,9 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =========================================================
-    // 4. BOOKING FLOW (DB + PDF)
+    // 4. BOOKING FLOW (MODIFIED FOR PAYMENT MODAL)
     // =========================================================
 
+    // Dashboard Search
     const searchBtn = document.getElementById('search-btn');
     if (searchBtn) {
         searchBtn.addEventListener('click', (e) => {
@@ -263,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Select Car
     document.querySelectorAll('.btn-select').forEach(button => {
         button.addEventListener('click', function() {
             sessionStorage.setItem('selectedCarName', this.getAttribute('data-name'));
@@ -271,8 +260,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Booking Page Logic
     const bookingSummary = document.querySelector('.booking-card');
     if (bookingSummary) {
+        // 1. Calculate and Display
         const location = sessionStorage.getItem('rentalLocation') || "Kuala Lumpur Intl Airport (KUL)";
         const pickupStr = sessionStorage.getItem('pickupDate') || "05/12/2025 10:00 AM";
         const dropoffStr = sessionStorage.getItem('dropoffDate') || "10/12/2025 11:00 AM";
@@ -299,29 +290,57 @@ document.addEventListener('DOMContentLoaded', () => {
         const payBtn = document.getElementById('btn-pay-text');
         payBtn.textContent = `Confirm & Pay RM${total.toFixed(2)}`;
 
-        payBtn.addEventListener('click', () => {
-            const user = auth.currentUser;
-            if (!user) { alert("Please login first."); return; }
+        // 2. MODAL LOGIC: Show Modal on Click
+        const modal = document.getElementById('payment-modal');
+        const closeModal = document.getElementById('close-modal');
 
+        payBtn.addEventListener('click', () => {
+             // Basic Check if logged in
+             if (!auth.currentUser) { alert("Please login first."); return; }
+             // Show Modal
+             modal.style.display = 'flex';
+        });
+
+        // Close Modal Logic
+        closeModal.addEventListener('click', () => { modal.style.display = 'none'; });
+        window.addEventListener('click', (e) => { if (e.target == modal) modal.style.display = 'none'; });
+
+        // 3. CONFIRM PAYMENT FUNCTION (Global scope to be called by HTML onclick)
+        window.confirmPayment = function(methodName) {
+            const user = auth.currentUser;
             const phoneInput = document.querySelector('.payment-form-box input[placeholder="123 456 7890"]');
+            
+            // Create Booking Object
             const newBooking = {
-                carName: carName, location: location, dateRange: `${formatD(date1)} to ${formatD(date2)}`,
-                totalPrice: total.toFixed(2), phone: phoneInput ? phoneInput.value : "",
-                status: "Active", createdAt: new Date()
+                carName: carName, 
+                location: location, 
+                dateRange: `${formatD(date1)} to ${formatD(date2)}`,
+                totalPrice: total.toFixed(2), 
+                phone: phoneInput ? phoneInput.value : "",
+                status: "Active", 
+                paymentMethod: methodName, // Save the method
+                createdAt: new Date()
             };
 
+            // Save to Firebase
             db.collection("users").doc(user.uid).collection("bookings").add(newBooking)
             .then((docRef) => {
+                // Generate PDF
                 newBooking.id = docRef.id.substring(0, 8).toUpperCase();
-                generateDetailedPDF(newBooking, diffDays, rentalFee, insurance, taxes, newBooking.phone);
+                generateDetailedPDF(newBooking, diffDays, rentalFee, insurance, taxes, newBooking.phone, methodName);
+                
+                // Hide Modal
+                modal.style.display = 'none';
+                
+                // Redirect
                 setTimeout(() => { window.location.href = 'my-bookings.html'; }, 1000);
             })
             .catch((err) => alert("Booking failed: " + err.message));
-        });
+        };
     }
 
     // =========================================================
-    // 5. MY BOOKINGS (Read from DB)
+    // 5. MY BOOKINGS
     // =========================================================
     const bookingsListContainer = document.getElementById('bookings-list');
     if (bookingsListContainer) {
@@ -374,6 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="price-info">
                                 <p>Total: RM${booking.totalPrice}</p>
+                                <p style="font-size:0.8rem; color:#9ca3af; margin-top:5px;">${booking.paymentMethod || "Credit Card"}</p>
                             </div>
                         </div>
                         <div class="card-actions"><a href="#">View Details</a>${btnHtml}</div>
@@ -391,11 +411,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
             
-            // Re-download PDF logic
             document.querySelectorAll('.btn-receipt').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    alert("Receipt download started...");
-                });
+                btn.addEventListener('click', function() { alert("Receipt download started..."); });
             });
         }
     }
