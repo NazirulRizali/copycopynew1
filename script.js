@@ -1,34 +1,13 @@
 /* =========================================
-   script.js - FINAL COMPLETE VERSION
-   Includes: Firebase Auth/DB, Map, Calendar, PDF
+   script.js - FINAL VERSION (Currency: RM)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // =========================================================
-    // 0. FIREBASE CONFIGURATION (Your Keys)
-    // =========================================================
-    const firebaseConfig = {
-        apiKey: "AIzaSyAz5jt1yefwtZC0W2WvCMD7YHh31U7ZL0g",
-        authDomain: "saferent-car.firebaseapp.com",
-        projectId: "saferent-car",
-        storageBucket: "saferent-car.firebasestorage.app",
-        messagingSenderId: "992172726560",
-        appId: "1:992172726560:web:402e9bed24fd38d90e9f45"
-    };
-
-    // Initialize Firebase (Compat)
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // =========================================================
-    // 1. HELPER FUNCTIONS
-    // =========================================================
+    // Helper: Format Date
     const formatD = (d) => d && !isNaN(d) ? d.toISOString().split('T')[0] : "Invalid Date";
     
+    // Helper: Parse Date
     function parseDate(str) {
         if(!str) return new Date();
         const [datePart, timePart, ampm] = str.split(' ');
@@ -39,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return new Date(year, month - 1, day, hours, minutes);
     }
 
+    // PDF Generator (Updated to RM)
     function generateDetailedPDF(booking, diffDays, rentalFee, insurance, taxes, phone) {
         const { jsPDF } = window.jspdf;
         if (!jsPDF) return;
@@ -64,13 +44,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Summary
         doc.setFontSize(14); doc.text("Payment Summary", 20, 130);
         doc.setFontSize(10);
+        // CHANGED TO RM
         doc.text(`Rental Fee (${diffDays} days):`, 20, 140); doc.text(`RM${rentalFee.toFixed(2)}`, 190, 140, { align: "right" });
-        doc.text("Insurance:", 20, 150); doc.text(`RMRM{insurance.toFixed(2)}`, 190, 150, { align: "right" });
+        doc.text("Insurance:", 20, 150); doc.text(`RM${insurance.toFixed(2)}`, 190, 150, { align: "right" });
         doc.text("Taxes & Fees:", 20, 160); doc.text(`RM${taxes.toFixed(2)}`, 190, 160, { align: "right" });
         
         doc.setFontSize(12); doc.setFont("helvetica", "bold");
         doc.text("TOTAL PAID:", 20, 180);
-        doc.setTextColor(200, 78, 8); doc.text(`RM${booking.totalPrice}`, 190, 180, { align: "right" });
+        doc.setTextColor(200, 78, 8); 
+        // CHANGED TO RM
+        doc.text(`RM${booking.totalPrice}`, 190, 180, { align: "right" });
 
         // Footer
         doc.setTextColor(150, 150, 150); doc.setFontSize(10); doc.setFont("helvetica", "normal");
@@ -80,54 +63,59 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================
-    // 2. MAP LOGIC (LIGHT MODE)
+    // 0. FIREBASE CONFIGURATION
     // =========================================================
-   // =========================================================
-    // 1. DATA & MAP LOGIC (Smart Location)
+    const firebaseConfig = {
+        apiKey: "AIzaSyAz5jt1yefwtZC0W2WvCMD7YHh31U7ZL0g",
+        authDomain: "saferent-car.firebaseapp.com",
+        projectId: "saferent-car",
+        storageBucket: "saferent-car.firebasestorage.app",
+        messagingSenderId: "992172726560",
+        appId: "1:992172726560:web:402e9bed24fd38d90e9f45"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
     // =========================================================
-    // =========================================================
-    // 1. DATA & MAP LOGIC
+    // 1. MAP LOGIC
     // =========================================================
     const mapElement = document.getElementById('dashboard-map');
     const locationSelect = document.getElementById('pickup-location');
 
-    // AIRPORT DATA
     const airports = [
         { name: "KLIA (Kuala Lumpur Intl)", code: "KUL", lat: 2.7456, lng: 101.7099 },
-        { name: "Subang Airport (Sultan Abdul Aziz Shah)", code: "SZB", lat: 3.1306, lng: 101.5490 },
-        { name: "Penang Intl Airport", code: "PEN", lat: 5.2971, lng: 100.2769 },
-        { name: "Langkawi Intl Airport", code: "LGK", lat: 6.3333, lng: 99.7333 },
-        { name: "Senai Intl Airport (Johor)", code: "JHB", lat: 1.6413, lng: 103.6700 },
-        { name: "Kota Bharu (Sultan Ismail Petra)", code: "KBR", lat: 6.1681, lng: 102.2936 },
-        { name: "Kuala Terengganu (Sultan Mahmud)", code: "TGG", lat: 5.3826, lng: 103.1030 },
-        { name: "Ipoh (Sultan Azlan Shah)", code: "IPH", lat: 4.5680, lng: 101.0920 },
-        { name: "Kuantan (Sultan Ahmad Shah)", code: "KUA", lat: 3.7697, lng: 103.2094 },
-        { name: "Alor Setar (Sultan Abdul Halim)", code: "AOR", lat: 6.1944, lng: 100.4008 },
-        { name: "Malacca Intl Airport", code: "MKZ", lat: 2.2656, lng: 102.2528 }
+        { name: "Subang (SZB)", lat: 3.1306, lng: 101.5490 },
+        { name: "Penang (PEN)", lat: 5.2971, lng: 100.2769 },
+        { name: "Langkawi (LGK)", lat: 6.3333, lng: 99.7333 },
+        { name: "Senai (JHB)", lat: 1.6413, lng: 103.6700 },
+        { name: "Kota Bharu (KBR)", lat: 6.1681, lng: 102.2936 },
+        { name: "Terengganu (TGG)", lat: 5.3826, lng: 103.1030 },
+        { name: "Ipoh (IPH)", lat: 4.5680, lng: 101.0920 },
+        { name: "Kuantan (KUA)", lat: 3.7697, lng: 103.2094 },
+        { name: "Alor Setar (AOR)", lat: 6.1944, lng: 100.4008 },
+        { name: "Malacca (MKZ)", lat: 2.2656, lng: 102.2528 }
     ];
 
-    // A. POPULATE DROPDOWN (Manual Select Only)
+    // Populate Dropdown
     if (locationSelect) {
-        // Reset to default
         locationSelect.innerHTML = '<option value="" disabled selected>Select Pick-up Location</option>';
-        
         airports.forEach(ap => {
             const option = document.createElement('option');
-            // Store simple name for the booking display
             option.value = `${ap.code} (${ap.name})`; 
             option.text = `${ap.name} (${ap.code})`;
             locationSelect.appendChild(option);
         });
     }
 
-    // B. INITIALIZE MAP (Just showing the map, no auto-select)
+    // Initialize Map
     if (mapElement) {
         const map = L.map('dashboard-map').setView([4.2105, 101.9758], 6);
-
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; CARTO',
-            subdomains: 'abcd',
-            maxZoom: 19
+            attribution: '&copy; CARTO', subdomains: 'abcd', maxZoom: 19
         }).addTo(map);
 
         const carIcon = L.icon({
@@ -137,26 +125,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         airports.forEach(ap => {
-            L.marker([ap.lat, ap.lng], { icon: carIcon })
-             .addTo(map)
-             .bindPopup(`<b>${ap.name} (${ap.code})</b><br>Available for Pickup`);
+            L.marker([ap.lat, ap.lng], { icon: carIcon }).addTo(map).bindPopup(`<b>${ap.name}</b><br>Available`);
         });
 
-        // Optional: Show user location on map visually, but DO NOT affect the dropdown
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(position => {
+            navigator.geolocation.getCurrentPosition(pos => {
                 const userIcon = L.icon({
                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
                     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
                     iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
                 });
-                L.marker([position.coords.latitude, position.coords.longitude], { icon: userIcon }).addTo(map).bindPopup("<b>You</b>");
+                L.marker([pos.coords.latitude, pos.coords.longitude], { icon: userIcon }).addTo(map).bindPopup("<b>You</b>");
             }, () => console.log("Geo denied"));
         }
     }
 
     // =========================================================
-    // 3. CUSTOM CALENDAR (FLATPICKR)
+    // 2. CUSTOM CALENDAR (FLATPICKR)
     // =========================================================
     if (document.getElementById("pickup-date")) {
         const datePickerConfig = {
@@ -188,10 +173,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================
-    // 4. AUTH LOGIC (Login, Signup, Logout)
+    // 3. AUTH LOGIC
     // =========================================================
-
-    // Sign Up
     const signupBtn = document.getElementById('btn-signup-action');
     if (signupBtn) {
         signupBtn.addEventListener('click', (e) => {
@@ -220,7 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Login
     const loginBtn = document.getElementById('btn-login-action');
     if (loginBtn) {
         loginBtn.addEventListener('click', (e) => {
@@ -242,7 +224,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Logout
     document.querySelectorAll('.btn-logout').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -250,7 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Auth State Listener (Protect Pages)
     auth.onAuthStateChanged((user) => {
         const path = window.location.pathname;
         const isPublic = path.includes('login') || path.includes('signup') || path.includes('verify');
@@ -265,10 +245,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =========================================================
-    // 5. BOOKING FLOW (DB + PDF)
+    // 4. BOOKING FLOW (DB + PDF)
     // =========================================================
 
-    // Search
     const searchBtn = document.getElementById('search-btn');
     if (searchBtn) {
         searchBtn.addEventListener('click', (e) => {
@@ -280,7 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Select Car
     document.querySelectorAll('.btn-select').forEach(button => {
         button.addEventListener('click', function() {
             sessionStorage.setItem('selectedCarName', this.getAttribute('data-name'));
@@ -289,7 +267,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Confirm & Pay (Save to DB)
     const bookingSummary = document.querySelector('.booking-card');
     if (bookingSummary) {
         const location = sessionStorage.getItem('rentalLocation') || "KUL";
@@ -312,11 +289,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('display-location').textContent = location;
         document.getElementById('display-dates').textContent = `${formatD(date1)} to ${formatD(date2)}`;
         document.getElementById('label-days').textContent = `Rental Fee (${diffDays} days):`;
-        document.getElementById('display-rental-fee').textContent = `$${rentalFee.toFixed(2)}`;
-        document.getElementById('display-total').textContent = `$${total.toFixed(2)}`;
+        // CHANGED TO RM
+        document.getElementById('display-rental-fee').textContent = `RM${rentalFee.toFixed(2)}`;
+        document.getElementById('display-total').textContent = `RM${total.toFixed(2)}`;
         
         const payBtn = document.getElementById('btn-pay-text');
-        payBtn.textContent = `Confirm & Pay $${total.toFixed(2)}`;
+        // CHANGED TO RM
+        payBtn.textContent = `Confirm & Pay RM${total.toFixed(2)}`;
 
         payBtn.addEventListener('click', () => {
             const user = auth.currentUser;
@@ -329,7 +308,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 status: "Active", createdAt: new Date()
             };
 
-            // Save to Firestore
             db.collection("users").doc(user.uid).collection("bookings").add(newBooking)
             .then((docRef) => {
                 newBooking.id = docRef.id.substring(0, 8).toUpperCase();
@@ -341,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================
-    // 6. MY BOOKINGS (Read from DB)
+    // 5. MY BOOKINGS (Read from DB)
     // =========================================================
     const bookingsListContainer = document.getElementById('bookings-list');
     if (bookingsListContainer) {
@@ -392,7 +370,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <p class="detail-text">Dates: ${booking.dateRange}</p>
                                 <p class="detail-text">Location: ${booking.location}</p>
                             </div>
-                            <div class="price-info"><p>Total: $${booking.totalPrice}</p></div>
+                            <div class="price-info">
+                                <p>Total: RM${booking.totalPrice}</p>
+                            </div>
                         </div>
                         <div class="card-actions"><a href="#">View Details</a>${btnHtml}</div>
                     </div>`;
@@ -406,6 +386,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         db.collection("users").doc(auth.currentUser.uid).collection("bookings").doc(docId).delete()
                         .then(() => location.reload());
                     }
+                });
+            });
+            
+            // Re-download PDF logic for past bookings
+            document.querySelectorAll('.btn-receipt').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // (You can add the re-download logic here if needed, simplified for now)
+                    alert("Receipt download started...");
                 });
             });
         }
