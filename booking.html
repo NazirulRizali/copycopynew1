@@ -98,32 +98,36 @@
             </div>
             
             <div class="payment-options">
-                <div class="payment-option" onclick="confirmPayment('Credit/Debit Card')">
+                <div class="payment-option" onclick="selectPayment(this, 'Credit/Debit Card')">
                     <div class="pay-icon"><i class="fa-brands fa-cc-visa"></i></div>
                     <div class="pay-info">
                         <h4>Credit / Debit Card</h4>
                         <p>Visa, Mastercard, Amex</p>
                     </div>
-                    <div class="pay-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="check-icon"><i class="fa-solid fa-circle-check"></i></div>
                 </div>
 
-                <div class="payment-option" onclick="confirmPayment('Online Banking (FPX)')">
+                <div class="payment-option" onclick="selectPayment(this, 'Online Banking (FPX)')">
                     <div class="pay-icon"><i class="fa-solid fa-building-columns"></i></div>
                     <div class="pay-info">
                         <h4>Online Banking (FPX)</h4>
                         <p>Maybank2u, CIMB Clicks, etc.</p>
                     </div>
-                    <div class="pay-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="check-icon"><i class="fa-solid fa-circle-check"></i></div>
                 </div>
 
-                <div class="payment-option" onclick="confirmPayment('E-Wallet')">
+                <div class="payment-option" onclick="selectPayment(this, 'E-Wallet')">
                     <div class="pay-icon"><i class="fa-solid fa-wallet"></i></div>
                     <div class="pay-info">
                         <h4>E-Wallet</h4>
                         <p>Touch 'n Go, GrabPay</p>
                     </div>
-                    <div class="pay-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                    <div class="check-icon"><i class="fa-solid fa-circle-check"></i></div>
                 </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="btn-final-pay" class="btn-pay-modal" disabled>Pay Now</button>
             </div>
         </div>
     </div>
