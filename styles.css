@@ -9,9 +9,10 @@
 }
 
 :root {
-    --bg-dark: #0f1219;
-    --card-dark: #161c27;
-    --accent-orange: #c84e08;
+    --bg-dark: #0f1219;       /* Main background */
+    --card-dark: #161c27;     /* Card background */
+    --card-inner: #1f2736;    /* Input/Image bg */
+    --accent-orange: #c84e08; /* Primary Orange */
     --text-white: #ffffff;
     --text-gray: #9ca3af;
     --border-color: #374151;
@@ -33,14 +34,38 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 3rem;
+    background-color: var(--bg-dark);
 }
 
-.logo { font-size: 1.5rem; font-weight: 800; }
-.logo-orange { color: var(--accent-orange); }
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
 
-.nav-links { display: flex; align-items: center; gap: 2rem; }
-.nav-links a { text-decoration: none; color: #cbd5e1; font-size: 0.95rem; transition: 0.3s; }
-.nav-links a:hover { color: var(--text-white); }
+.logo-orange {
+    color: var(--accent-orange);
+}
+
+.logo-white {
+    color: var(--text-white);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: var(--text-white);
+}
 
 .btn-logout {
     background-color: var(--accent-orange);
@@ -50,11 +75,15 @@ body {
     font-weight: 600;
 }
 
+.btn-logout:hover {
+    background-color: #a84206;
+}
+
 /* =========================================
-   3. CONTAINER & SEARCH
+   3. MAIN CONTAINER & DASHBOARD
    ========================================= */
 .container {
-    max-width: 1100px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 2rem 1rem;
     flex: 1;
@@ -66,6 +95,13 @@ body {
     border-radius: 8px;
     border: 1px solid #1e2636;
     margin-bottom: 3rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.search-card h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.35rem;
+    font-weight: 700;
 }
 
 .search-grid {
@@ -82,26 +118,33 @@ body {
     margin-bottom: 0.5rem;
 }
 
-.input-wrapper { position: relative; display: flex; align-items: center; }
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
 
-.input-wrapper input, .dark-input {
+/* Standard Inputs */
+.input-wrapper input {
     width: 100%;
     background-color: #262f40;
     border: 1px solid #4b5563;
     color: #e2e8f0;
     padding: 0.8rem 1rem;
     border-radius: 4px;
-    outline: none;
     font-size: 0.9rem;
+    outline: none;
 }
 
-/* Custom Dropdown Arrow for Select */
-select.dark-input {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 1rem center;
-    background-size: 1em;
+.input-wrapper input:focus {
+    border-color: var(--accent-orange);
+}
+
+.input-wrapper i {
+    position: absolute;
+    right: 1rem;
+    color: #cbd5e1;
+    pointer-events: none;
 }
 
 .btn-search {
@@ -111,13 +154,34 @@ select.dark-input {
     border: none;
     padding: 0.9rem;
     border-radius: 4px;
+    font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-search:hover {
+    background-color: #a84206;
 }
 
 /* =========================================
-   4. OFFERS SECTION (CATEGORIES)
+   4. OFFERS SECTION
    ========================================= */
+.offers-section {
+    margin-top: 2rem;
+}
+
+.offers-section h3 {
+    font-size: 1.35rem;
+    margin-bottom: 0.5rem;
+}
+
+.divider {
+    height: 1px;
+    background-color: #334155;
+    margin-bottom: 2rem;
+}
+
 .offers-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -127,54 +191,420 @@ select.dark-input {
 .offer-card {
     background-color: var(--card-dark);
     border: 1px solid #1e2636;
-    border-radius: 12px;
-    overflow: hidden;
+    border-radius: 8px;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    transition: transform 0.3s ease;
 }
 
-.offer-card:hover { transform: translateY(-8px); border-color: var(--accent-orange); }
-
-.card-image-box {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    background-color: #000;
+.card-image-placeholder {
+    background-color: #1c2331;
+    height: 140px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
 }
 
-.offer-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.card-image-placeholder span {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #ffffff;
 }
 
-.card-content { padding: 1.5rem; }
-.card-content h4 { margin-bottom: 0.5rem; font-weight: 700; }
-.card-content p { color: var(--text-gray); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1.5rem; }
+.card-content h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.card-content p {
+    color: var(--text-gray);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+    min-height: 2.5rem;
+}
 
 .link-book {
     text-decoration: none;
     color: #e67e22;
+    font-size: 0.9rem;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s;
+}
+
+.link-book:hover {
+    color: #f39c12;
+}
+
+/* =========================================
+   5. FOOTER
+   ========================================= */
+footer {
+    border-top: 1px solid #1f2937;
+    padding: 2rem;
+    text-align: center;
+    margin-top: auto;
+}
+
+footer p {
+    color: var(--text-gray);
+    font-size: 0.85rem;
+}
+
+footer a {
+    color: var(--accent-orange);
+    text-decoration: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .search-grid, .offers-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .navbar {
+        padding: 1rem;
+    }
+}
+
+/* =========================================
+   6. MAP SECTION STYLES
+   ========================================= */
+.map-section {
+    margin-bottom: 3rem;
+}
+
+.map-section h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: white;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-/* =========================================
-   5. MAP & FOOTER
-   ========================================= */
 #dashboard-map {
     height: 400px;
     width: 100%;
     border-radius: 8px;
     border: 1px solid #374151;
-    margin-bottom: 3rem;
+    z-index: 1;
 }
 
-footer { padding: 2.5rem; text-align: center; color: var(--text-gray); font-size: 0.85rem; border-top: 1px solid #1f2937; }
+/* Custom Popup Styles for Map */
+.leaflet-popup-content-wrapper {
+    background: #1f2937;
+    color: #fff;
+    border-radius: 4px;
+}
+.leaflet-popup-tip {
+    background: #1f2937;
+}
+.leaflet-container a.leaflet-popup-close-button {
+    color: #ccc;
+}
 
-@media (max-width: 768px) {
-    .search-grid, .offers-grid { grid-template-columns: 1fr; }
-    .navbar { padding: 1rem; }
+/* =========================================
+   7. CUSTOM FLATPICKR STYLE (Side-by-Side)
+   ========================================= */
+
+.flatpickr-calendar {
+    width: 480px !important;
+    padding: 10px;
+}
+
+.flatpickr-innerContainer {
+    display: flex;
+    flex-direction: row;
+}
+
+.flatpickr-rContainer {
+    display: inline-block;
+    width: 310px;
+    border-right: 1px solid #e6e6e6;
+    padding-right: 10px;
+}
+
+.flatpickr-time {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    width: 130px !important;
+    height: auto !important;
+    border-top: none !important;
+    padding-left: 10px;
+}
+
+.flatpickr-time .flatpickr-time-separator,
+.flatpickr-time .numInputWrapper {
+    color: #333;
+    font-weight: bold;
+}
+
+.flatpickr-time input.flatpickr-hour, 
+.flatpickr-time input.flatpickr-minute,
+.flatpickr-time .flatpickr-am-pm {
+    background: #007bff;
+    color: white !important;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    height: 40px;
+    line-height: 40px;
+    border: none;
+}
+.flatpickr-time input:focus {
+    background: #0056b3;
+}
+
+.flatpickr-footer {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid #e6e6e6;
+    margin-top: 10px;
+}
+
+.flatpickr-btn {
+    background: transparent;
+    border: none;
+    color: #007bff;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+}
+.flatpickr-btn:hover {
+    text-decoration: underline;
+}
+
+/* =========================================
+   8. NEW: AIRPORT DROPDOWN STYLES
+   ========================================= */
+
+/* Dropdown styling to match existing inputs */
+select.dark-input {
+    width: 100%;
+    background-color: #262f40; /* Input background color */
+    border: 1px solid #4b5563;
+    color: #e2e8f0;
+    padding: 0.8rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    outline: none;
+    appearance: none; /* Removes standard arrow for cleaner look */
+    cursor: pointer;
+    /* Adding a custom arrow here since appearance:none removes it */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+}
+
+select.dark-input:focus {
+    border-color: var(--accent-orange);
+}
+
+/* Ensure options have dark background (mostly for Windows/Android) */
+select.dark-input option {
+    background-color: #262f40;
+    color: white;
+}
+
+/* =========================================
+   FIXED: DROPDOWN STYLE (Matches Original Input)
+   ========================================= */
+
+/* Force the select to look exactly like the text input */
+select#pickup-location {
+    width: 100%;
+    background-color: #262f40; /* Same dark blue-gray as before */
+    border: 1px solid #4b5563;
+    color: #e2e8f0;
+    padding: 0.8rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    outline: none;
+    appearance: none; /* Removes the ugly default browser arrow */
+    cursor: pointer;
+    
+    /* Adds a clean white arrow to the right, matching your icons */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1em;
+}
+
+select#pickup-location:focus {
+    border-color: #c84e08; /* Orange border on click */
+}
+
+/* Ensure dropdown options are dark */
+select#pickup-location option {
+    background-color: #1f2937;
+    color: white;
+    padding: 10px;
+}
+
+/* =========================================
+   PAYMENT MODAL STYLES (COMPLETE)
+   ========================================= */
+
+.modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #1f2937;
+    width: 100%;
+    max-width: 450px;
+    border-radius: 12px;
+    border: 1px solid #374151;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+    display: flex;       /* Added for footer layout */
+    flex-direction: column;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+    background-color: #c84e08;
+    padding: 1.2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.payment-options {
+    padding: 1rem;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    background-color: #161c27;
+    padding: 1rem;
+    margin-bottom: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid #374151;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.payment-option:hover {
+    background-color: #262f40;
+    border-color: #c84e08;
+}
+
+/* Highlight Selected Option */
+.payment-option.selected {
+    border: 2px solid #c84e08;
+    background-color: #262f40;
+}
+
+.payment-option.selected .check-icon {
+    color: #c84e08;
+    opacity: 1;
+}
+
+.pay-icon {
+    font-size: 1.5rem;
+    color: #cbd5e1;
+    width: 40px;
+    text-align: center;
+}
+
+.pay-info {
+    flex: 1;
+    margin-left: 1rem;
+}
+
+.pay-info h4 {
+    color: white;
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+}
+
+.pay-info p {
+    color: #9ca3af;
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+.check-icon {
+    color: #374151;
+    opacity: 0.5;
+    font-size: 1.2rem;
+    transition: color 0.2s;
+}
+
+/* Modal Footer & Pay Button */
+.modal-footer {
+    padding: 1rem 1.2rem 1.5rem 1.2rem;
+    border-top: 1px solid #374151;
+    background-color: #1f2937;
+}
+
+.btn-pay-modal {
+    width: 100%;
+    background-color: #c84e08;
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-pay-modal:hover {
+    background-color: #a84206;
+}
+
+/* Disabled State (Grayed out) */
+.btn-pay-modal:disabled {
+    background-color: #4b5563;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Add this anywhere in styles.css */
+#link-forgot-pass:hover {
+    text-decoration: underline !important;
+    color: #f39c12 !important;
 }
