@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support - SafeRent Car</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="support.css"> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo"><span class="logo-orange">SafeRent</span> <span class="logo-white">Car</span></div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="my-bookings.html">My Bookings</a>
+            <a href="#" class="active-link" style="color: white;">Support</a> <a href="#" class="btn-logout">Logout</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="support-header">
+            <h2>How can we help you?</h2>
+            <p>Our team is available 24/7 to assist you with your booking.</p>
+        </div>
+
+        <div class="contact-grid">
+            <div class="contact-card">
+                <div class="icon-circle"><i class="fa-solid fa-phone"></i></div>
+                <h3>Call Us</h3>
+                <p>+60 12 345 6789</p>
+                <span>Available 24/7</span>
+            </div>
+            <div class="contact-card">
+                <div class="icon-circle"><i class="fa-solid fa-envelope"></i></div>
+                <h3>Email Us</h3>
+                <p>support@saferent.com</p>
+                <span>Response within 2 hours</span>
+            </div>
+            <div class="contact-card">
+                <div class="icon-circle"><i class="fa-solid fa-location-dot"></i></div>
+                <h3>Headquarters</h3>
+                <p>Kuala Lumpur, Malaysia</p>
+                <span>Main Office</span>
+            </div>
+        </div>
+
+        <div class="message-section">
+            <div class="form-card">
+                <h3>Send us a Message</h3>
+                <form id="support-form">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Your Name</label>
+                            <input type="text" id="sup-name" class="dark-input" placeholder="Enter your name" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Email Address</label>
+                            <input type="email" id="sup-email" class="dark-input" placeholder="Enter your email" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Subject</label>
+                        <select id="sup-subject" class="dark-input">
+                            <option>Booking Inquiry</option>
+                            <option>Payment Issue</option>
+                            <option>Car Condition Report</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Message</label>
+                        <textarea id="sup-message" class="dark-input" rows="5" placeholder="How can we help?" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 SafeRent Car. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
