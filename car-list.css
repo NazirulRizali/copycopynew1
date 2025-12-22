@@ -1,5 +1,5 @@
 /* =========================================
-   CAR LIST PAGE SPECIFIC STYLES
+   CAR LIST PAGE - LANDSCAPE OPTIMIZED
    ========================================= */
 
 /* Header with Orange Underline */
@@ -38,7 +38,7 @@
 }
 
 /* Car Card Styling 
-   Padding set to 0 to allow the image to be edge-to-edge 
+   Padding is 0 to let the image touch the top and sides 
 */
 .car-card {
     background-color: var(--card-dark);
@@ -57,12 +57,12 @@
 }
 
 /* LANDSCAPE IMAGE BOX 
-   Uses aspect-ratio to prevent "zoomed in" or "black bar" looks
+   This forces the box into a wide 16:9 rectangle 
 */
 .car-image-box {
-    background-color: #1a202c;
+    background-color: #000;
     width: 100%;
-    aspect-ratio: 16 / 9; /* Professional landscape ratio */
+    aspect-ratio: 16 / 9; 
     overflow: hidden;
     display: flex;
     justify-content: center;
@@ -70,11 +70,13 @@
     position: relative;
 }
 
-/* IMAGE STYLING */
+/* IMAGE STYLING 
+   Using these new photos, 'cover' will show the full car beautifully
+*/
 .car-img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Fills the 16:9 box perfectly */
+    object-fit: cover; 
     object-position: center;
     display: block;
     transition: transform 0.4s ease;
@@ -85,7 +87,7 @@
 }
 
 /* Car Details Padding 
-   Added here since the main card padding was removed
+   Added here to provide space for text since card padding is 0
 */
 .car-details {
     padding: 1.25rem;
@@ -123,10 +125,12 @@
     flex-grow: 1;
 }
 
-/* Select Button */
+/* Select Button 
+   Updated to match the solid orange style in your target image
+*/
 .btn-select {
     width: 100%;
-    background-color: var(--accent-orange);
+    background-color: #c2410c; /* Deep industrial orange */
     color: white;
     border: none;
     padding: 0.75rem;
@@ -138,7 +142,7 @@
 }
 
 .btn-select:hover {
-    background-color: #d35400; /* Deep orange hover */
+    background-color: #a84206; 
 }
 
 /* Action Area */
@@ -159,10 +163,6 @@
     display: flex;
     align-items: center;
     gap: 0.6rem;
-}
-
-.btn-modify:hover {
-    background-color: #4b5563;
 }
 
 /* Responsive adjustments */
