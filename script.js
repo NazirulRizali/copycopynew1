@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - FINAL (Login + Reset Password + Payment)
+   script.js - STRICT VERIFICATION VERSION
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,14 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!jsPDF) return;
         const doc = new jsPDF();
 
-        // Header
         doc.setFillColor(200, 78, 8); doc.rect(0, 0, 210, 40, 'F'); 
         doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.setFont("helvetica", "bold");
         doc.text("SafeRent Car", 20, 25);
         doc.setFontSize(12); doc.setFont("helvetica", "normal");
         doc.text("Booking Confirmation", 190, 25, { align: "right" });
 
-        // Details
         doc.setTextColor(0, 0, 0); doc.setFontSize(14); doc.text("Rental Details", 20, 60);
         doc.setFontSize(10);
         doc.text("Car Model:", 20, 70); doc.text(booking.carName, 90, 70);
@@ -42,7 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         doc.setLineWidth(0.5); doc.line(20, 120, 190, 120);
         
-        // Summary
         doc.setFontSize(14); doc.text("Payment Summary", 20, 140);
         doc.setFontSize(10);
         doc.text(`Rental Fee (${diffDays} days):`, 20, 150); doc.text(`RM${rentalFee.toFixed(2)}`, 190, 150, { align: "right" });
@@ -54,7 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setTextColor(200, 78, 8); 
         doc.text(`RM${booking.totalPrice}`, 190, 190, { align: "right" });
 
-        // Footer
         doc.setTextColor(150, 150, 150); doc.setFontSize(10); doc.setFont("helvetica", "normal");
         doc.text("Thank you for choosing SafeRent Car!", 105, 280, { align: "center" });
 
@@ -146,15 +142,12 @@ document.addEventListener('DOMContentLoaded', () => {
             onReady: function(selectedDates, dateStr, instance) {
                 const footer = document.createElement("div");
                 footer.classList.add("flatpickr-footer");
-                
                 const clearBtn = document.createElement("button");
                 clearBtn.innerText = "Clear"; clearBtn.classList.add("flatpickr-btn");
                 clearBtn.addEventListener("click", () => { instance.clear(); instance.close(); });
-
                 const todayBtn = document.createElement("button");
                 todayBtn.innerText = "Today"; todayBtn.classList.add("flatpickr-btn");
                 todayBtn.addEventListener("click", () => { instance.setDate(new Date()); });
-
                 footer.appendChild(clearBtn); footer.appendChild(todayBtn);
                 instance.calendarContainer.appendChild(footer);
             }
@@ -164,10 +157,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================
-    // 3. AUTH LOGIC (SIGNUP, LOGIN & RESET)
+    // 3. AUTH LOGIC (STRICT VERIFICATION)
     // =========================================================
     
-    // --- RESET PASSWORD LOGIC (New) ---
+    // --- RESET PASSWORD LOGIC ---
     const forgotLink = document.getElementById('link-forgot-pass');
     const resetModal = document.getElementById('reset-modal');
     const closeResetBtn = document.getElementById('close-reset-modal');
@@ -176,37 +169,24 @@ document.addEventListener('DOMContentLoaded', () => {
     if (forgotLink) {
         forgotLink.addEventListener('click', (e) => {
             e.preventDefault();
-            // Optional: Pre-fill email from login box
             const loginEmail = document.getElementById('login-email');
             const resetInput = document.getElementById('reset-email-input');
-            if(loginEmail && resetInput && loginEmail.value) {
-                resetInput.value = loginEmail.value;
-            }
+            if(loginEmail && resetInput && loginEmail.value) resetInput.value = loginEmail.value;
             if(resetModal) resetModal.style.display = 'flex';
         });
     }
 
     if (closeResetBtn) {
-        closeResetBtn.addEventListener('click', () => {
-            if(resetModal) resetModal.style.display = 'none';
-        });
-        window.addEventListener('click', (e) => {
-            if (e.target == resetModal) resetModal.style.display = 'none';
-        });
+        closeResetBtn.addEventListener('click', () => { if(resetModal) resetModal.style.display = 'none'; });
+        window.addEventListener('click', (e) => { if (e.target == resetModal) resetModal.style.display = 'none'; });
     }
 
     if (sendResetBtn) {
         sendResetBtn.addEventListener('click', () => {
             const email = document.getElementById('reset-email-input').value;
-
-            if (!email) {
-                alert("Please enter your email address.");
-                return;
-            }
-
+            if (!email) { alert("Please enter your email address."); return; }
             sendResetBtn.textContent = "Sending...";
             sendResetBtn.disabled = true;
-
             auth.sendPasswordResetEmail(email)
                 .then(() => {
                     alert("Password reset email sent! Check your inbox.");
@@ -222,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- SIGN UP LOGIC ---
+    // --- SIGN UP LOGIC (Force Logout After Creation) ---
     const signupBtn = document.getElementById('btn-signup-action');
     if (signupBtn) {
         signupBtn.addEventListener('click', (e) => {
@@ -243,7 +223,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     })
                     .then(() => {
-                        alert(`Account created! A verification email has been sent to ${email}.`);
+                        // FORCE LOGOUT so they can't access system without verifying
+                        return auth.signOut();
+                    })
+                    .then(() => {
+                        alert(`Account created! We sent a verification email to ${email}.\nPlease verify before logging in.`);
                         window.location.href = 'login.html';
                     })
                     .catch((error) => { alert("Error: " + error.message); });
@@ -251,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LOGIN LOGIC ---
+    // --- LOGIN LOGIC (Strict Verification Check) ---
     const loginBtn = document.getElementById('btn-login-action');
     if (loginBtn) {
         loginBtn.addEventListener('click', (e) => {
@@ -262,10 +246,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (email && pass) {
                 auth.signInWithEmailAndPassword(email, pass)
                     .then((userCredential) => {
-                        if (userCredential.user.emailVerified) {
+                        const user = userCredential.user;
+                        if (user.emailVerified) {
                             window.location.href = 'index.html';
                         } else {
-                            alert("Please verify your email first.");
+                            // IF NOT VERIFIED: Log them out immediately & Alert
+                            auth.signOut().then(() => {
+                                alert("Your email is not verified yet.\nPlease check your inbox and verify to login.");
+                            });
                         }
                     })
                     .catch((error) => { alert("Login Failed: " + error.message); });
@@ -280,20 +268,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- AUTH STATE LISTENER (Protect Pages) ---
     auth.onAuthStateChanged((user) => {
         const path = window.location.pathname;
         const isPublic = path.includes('login') || path.includes('signup') || path.includes('verify');
+        
         if (user) {
+            // If user is technically "logged in" but not verified, force logout if on a private page
+            // (Double safety check)
+            if (!user.emailVerified) {
+                // We allow them to stay on public pages (like login) to see alerts, 
+                // but if they try to be on 'index.html' (dashboard), we kick them.
+                if(!isPublic && (path.includes('index') || path.includes('booking') || path.includes('my-bookings'))) {
+                     auth.signOut().then(() => window.location.href = 'login.html');
+                }
+                return; 
+            }
+
+            // If Verified User is on Login page, send to Dashboard
             if (path.includes('login')) window.location.href = 'index.html';
+            
         } else {
-            if (!isPublic && path.includes('my-bookings')) {
+            // No User -> Redirect to login if on private page
+            // (Guests can view 'booking.html' to see price, but not 'my-bookings' or 'index')
+            if (!isPublic && (path.includes('my-bookings'))) {
                 window.location.href = 'login.html';
             }
         }
     });
 
     // =========================================================
-    // 4. BOOKING FLOW (MODAL PAYMENT)
+    // 4. BOOKING FLOW
     // =========================================================
     const searchBtn = document.getElementById('search-btn');
     if (searchBtn) {
@@ -348,10 +353,16 @@ document.addEventListener('DOMContentLoaded', () => {
         let selectedMethod = null;
 
         payBtn.addEventListener('click', () => {
-             if (!auth.currentUser) { 
+             // Strict check: Must be logged in AND verified
+             const user = auth.currentUser;
+             if (!user) { 
                  alert("You must log in first to complete your booking.\n\nRedirecting you to Login page...");
                  window.location.href = 'login.html';
                  return; 
+             }
+             if (!user.emailVerified) {
+                 alert("Your email is not verified.\nPlease verify your email before booking.");
+                 return;
              }
              modal.style.display = 'flex';
         });
@@ -410,7 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const bookingsListContainer = document.getElementById('bookings-list');
     if (bookingsListContainer) {
         auth.onAuthStateChanged((user) => {
-            if (user) {
+            if (user && user.emailVerified) {
                 bookingsListContainer.innerHTML = '<p style="color:white;">Loading...</p>';
                 db.collection("users").doc(user.uid).collection("bookings").orderBy("createdAt", "desc").get()
                 .then((snap) => {
