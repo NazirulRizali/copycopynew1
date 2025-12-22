@@ -192,25 +192,35 @@ body {
     background-color: var(--card-dark);
     border: 1px solid #1e2636;
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 1.2rem; /* Slightly reduced padding for a tighter landscape feel */
     display: flex;
     flex-direction: column;
+    transition: transform 0.2s ease;
 }
 
-.card-image-placeholder {
+.offer-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Landscape Image Container */
+.card-image-box, .card-image-placeholder {
     background-color: #1c2331;
-    height: 140px;
-    border-radius: 4px;
+    width: 100%;
+    aspect-ratio: 16 / 9; /* Forces a perfect landscape 16:9 ratio */
+    border-radius: 6px;
+    overflow: hidden; /* Clips the image to the border radius */
+    margin-bottom: 1.2rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1.5rem;
 }
 
-.card-image-placeholder span {
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: #ffffff;
+/* Ensures the actual image fills the landscape box correctly */
+.offer-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* This prevents the image from stretching */
+    object-position: center; /* Centers the car in the frame */
 }
 
 .card-content h4 {
@@ -223,8 +233,8 @@ body {
     color: var(--text-gray);
     font-size: 0.85rem;
     line-height: 1.4;
-    margin-bottom: 1.5rem;
-    min-height: 2.5rem;
+    margin-bottom: 1.2rem;
+    min-height: 3rem; /* Adjusted for landscape text flow */
 }
 
 .link-book {
@@ -235,6 +245,7 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    margin-top: auto; /* Pushes link to the bottom of the card */
     transition: color 0.2s;
 }
 
