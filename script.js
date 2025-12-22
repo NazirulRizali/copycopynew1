@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - COMPLETE (Auth, Booking, Support, Location, Validation)
+   script.js - COMPLETE (Auth, Booking, Support, Location, Validation, PDF Receipt)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -39,7 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function generateDetailedPDF(booking, diffDays, rentalFee, insurance, taxes, phone, method) {
         const { jsPDF } = window.jspdf;
-        if (!jsPDF) return;
+        if (!jsPDF) {
+            alert("PDF Library not loaded. Please refresh the page.");
+            return;
+        }
         const doc = new jsPDF();
 
         // Header
@@ -255,19 +258,15 @@ document.addEventListener('DOMContentLoaded', () => {
         searchBtn.addEventListener('click', (e) => {
             e.preventDefault();
 
-            // 1. Get Values
             const locationVal = document.getElementById('pickup-location').value;
             const pickupVal = document.getElementById('pickup-date').value;
             const dropoffVal = document.getElementById('dropoff-date').value;
 
-            // 2. CHECK: RESTRICTION
-            // If any value is missing, Alert and Stop.
             if (!locationVal || !pickupVal || !dropoffVal) {
                 alert("Please select a Pick-up Location, Pick-up Date, and Drop-off Date to continue.");
-                return; // Stop execution here
+                return; 
             }
 
-            // 3. Save & Redirect (Only happens if check passes)
             sessionStorage.setItem('rentalLocation', locationVal);
             sessionStorage.setItem('pickupDate', pickupVal);
             sessionStorage.setItem('dropoffDate', dropoffVal);
@@ -361,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------
-    // 5. MY BOOKINGS
+    // 5. MY BOOKINGS (UPDATED WITH PDF GENERATOR)
     // ---------------------------------------------------------
     const bookingsListContainer = document.getElementById('bookings-list');
     if (bookingsListContainer) {
@@ -372,7 +371,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then((snap) => {
                     const bookings = [];
                     snap.forEach(doc => {
-                        const d = doc.data(); d.id = doc.id.substring(0, 8).toUpperCase(); d.realDocId = doc.id; bookings.push(d);
+                        const d = doc.data(); 
+                        d.id = doc.id.substring(0, 8).toUpperCase(); 
+                        d.realDocId = doc.id; 
+                        bookings.push(d);
                     });
                     renderBookings(bookings);
                 });
@@ -382,33 +384,83 @@ document.addEventListener('DOMContentLoaded', () => {
         function renderBookings(bookings) {
             document.getElementById('bookings-title').textContent = `MY BOOKINGS (${bookings.length} Total)`;
             bookingsListContainer.innerHTML = ''; 
-            if(bookings.length === 0) { bookingsListContainer.innerHTML = '<p style="color:gray;">No bookings found.</p>'; return; }
+            
+            if(bookings.length === 0) { 
+                bookingsListContainer.innerHTML = '<p style="color:gray;">No bookings found.</p>'; 
+                return; 
+            }
 
-            bookings.forEach(booking => {
+            // Loop through bookings with index
+            bookings.forEach((booking, index) => {
                 const badgeClass = booking.status === "Active" ? "active" : "completed";
                 const btnHtml = booking.status === "Active" 
                     ? `<button class="btn-cancel" data-doc-id="${booking.realDocId}">Cancel</button>` 
                     : `<button class="btn-receipt">Download Receipt</button>`;
                 
+                // Added data-index to View Details button
                 bookingsListContainer.innerHTML += `
                     <div class="booking-card">
-                        <div class="card-top"><h3>${booking.status === "Active" ? "Upcoming" : "Past"} Rental</h3><span class="status-badge ${badgeClass}">${booking.status}</span></div>
-                        <div class="card-body">
-                            <div class="car-info"><h4>${booking.carName}</h4><p class="detail-text">ID: ${booking.id}</p><p class="detail-text">Dates: ${booking.dateRange}</p><p class="detail-text">Location: ${booking.location}</p></div>
-                            <div class="price-info"><p>Total: RM${booking.totalPrice}</p></div>
+                        <div class="card-top">
+                            <h3>${booking.status === "Active" ? "Upcoming" : "Past"} Rental</h3>
+                            <span class="status-badge ${badgeClass}">${booking.status}</span>
                         </div>
-                        <div class="card-actions"><a href="#">View Details</a>${btnHtml}</div>
+                        <div class="card-body">
+                            <div class="car-info">
+                                <h4>${booking.carName}</h4>
+                                <p class="detail-text">ID: ${booking.id}</p>
+                                <p class="detail-text">Dates: ${booking.dateRange}</p>
+                                <p class="detail-text">Location: ${booking.location}</p>
+                            </div>
+                            <div class="price-info">
+                                <p>Total: RM${booking.totalPrice}</p>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="#" class="btn-view-details" data-index="${index}">View Details</a>
+                            ${btnHtml}
+                        </div>
                     </div>`;
             });
+
+            // LOGIC FOR VIEW DETAILS PDF
+            document.querySelectorAll('.btn-view-details').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault(); // Stop page jump
+                    const index = this.getAttribute('data-index');
+                    const booking = bookings[index];
+
+                    // 1. Recalculate Days
+                    // Assuming dateRange format is "YYYY-MM-DD to YYYY-MM-DD" from formatD function
+                    const dates = booking.dateRange.split(' to ');
+                    const d1 = new Date(dates[0]);
+                    const d2 = new Date(dates[1]);
+                    const diffTime = Math.abs(d2 - d1);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
+
+                    // 2. Recalculate Costs
+                    const insurance = 25.00;
+                    const taxes = 15.50;
+                    const total = parseFloat(booking.totalPrice);
+                    const rentalFee = total - insurance - taxes;
+
+                    // 3. Generate PDF
+                    generateDetailedPDF(booking, diffDays, rentalFee, insurance, taxes, booking.phone, booking.paymentMethod);
+                });
+            });
             
+            // CANCEL LOGIC
             document.querySelectorAll('.btn-cancel').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    if(confirm("Cancel?")) {
-                        db.collection("users").doc(auth.currentUser.uid).collection("bookings").doc(this.getAttribute('data-doc-id')).delete().then(() => location.reload());
+                    if(confirm("Cancel this booking?")) {
+                        db.collection("users").doc(auth.currentUser.uid)
+                          .collection("bookings").doc(this.getAttribute('data-doc-id'))
+                          .delete().then(() => location.reload());
                     }
                 });
             });
-            document.querySelectorAll('.btn-receipt').forEach(btn => btn.addEventListener('click', () => alert("Receipt download started...")));
+            
+            // DOWNLOAD RECEIPT LOGIC (Optional reuse)
+            document.querySelectorAll('.btn-receipt').forEach(btn => btn.addEventListener('click', () => alert("Click 'View Details' to download receipt.")));
         }
     }
 
