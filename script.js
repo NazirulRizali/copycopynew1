@@ -382,98 +382,35 @@ document.addEventListener('DOMContentLoaded', () => {
         function renderBookings(bookings) {
             document.getElementById('bookings-title').textContent = `MY BOOKINGS (${bookings.length} Total)`;
             bookingsListContainer.innerHTML = ''; 
-            
-            if(bookings.length === 0) { 
-                bookingsListContainer.innerHTML = '<p style="color:gray;">No bookings found.</p>'; 
-                return; 
-            }
+            if(bookings.length === 0) { bookingsListContainer.innerHTML = '<p style="color:gray;">No bookings found.</p>'; return; }
 
-            bookings.forEach((booking, index) => {
+            bookings.forEach(booking => {
                 const badgeClass = booking.status === "Active" ? "active" : "completed";
                 const btnHtml = booking.status === "Active" 
                     ? `<button class="btn-cancel" data-doc-id="${booking.realDocId}">Cancel</button>` 
                     : `<button class="btn-receipt">Download Receipt</button>`;
                 
-                // UPDATED: Added class="btn-view-details" and data-index="${index}"
                 bookingsListContainer.innerHTML += `
                     <div class="booking-card">
-                        <div class="card-top">
-                            <h3>${booking.status === "Active" ? "Upcoming" : "Past"} Rental</h3>
-                            <span class="status-badge ${badgeClass}">${booking.status}</span>
-                        </div>
+                        <div class="card-top"><h3>${booking.status === "Active" ? "Upcoming" : "Past"} Rental</h3><span class="status-badge ${badgeClass}">${booking.status}</span></div>
                         <div class="card-body">
-                            <div class="car-info">
-                                <h4>${booking.carName}</h4>
-                                <p class="detail-text">ID: ${booking.id}</p>
-                                <p class="detail-text">Dates: ${booking.dateRange}</p>
-                                <p class="detail-text">Location: ${booking.location}</p>
-                            </div>
-                            <div class="price-info">
-                                <p>Total: RM${booking.totalPrice}</p>
-                            </div>
+                            <div class="car-info"><h4>${booking.carName}</h4><p class="detail-text">ID: ${booking.id}</p><p class="detail-text">Dates: ${booking.dateRange}</p><p class="detail-text">Location: ${booking.location}</p></div>
+                            <div class="price-info"><p>Total: RM${booking.totalPrice}</p></div>
                         </div>
-                        <div class="card-actions">
-                            <a href="#" class="btn-view-details" data-index="${index}">View Details</a>
-                            ${btnHtml}
-                        </div>
+                        <div class="card-actions"><a href="#">View Details</a>${btnHtml}</div>
                     </div>`;
             });
             
-            // --- NEW: VIEW DETAILS PDF LOGIC ---
-            document.querySelectorAll('.btn-view-details').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault(); // Stop the page from jumping
-                    
-                    const index = this.getAttribute('data-index');
-                    const booking = bookings[index]; // Get the booking data from memory
-
-                    // 1. Recalculate Days from the Date Range string
-                    // Format is usually "2025-12-05 to 2025-12-10"
-                    const dates = booking.dateRange.split(' to ');
-                    const d1 = new Date(dates[0]);
-                    const d2 = new Date(dates[1]);
-                    const diffTime = Math.abs(d2 - d1);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
-                    
-                    // 2. Reverse Calculate the Costs (Since we only saved the Total)
-                    const insurance = 25.00;
-                    const taxes = 15.50;
-                    const total = parseFloat(booking.totalPrice);
-                    const rentalFee = total - insurance - taxes;
-
-                    // 3. Generate the PDF
-                    // We pass the recalculated data back into your generator function
-                    generateDetailedPDF(
-                        booking, 
-                        diffDays, 
-                        rentalFee, 
-                        insurance, 
-                        taxes, 
-                        booking.phone, 
-                        booking.paymentMethod
-                    );
-                });
-            });
-
-            // --- EXISTING CANCEL LOGIC ---
             document.querySelectorAll('.btn-cancel').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    if(confirm("Cancel this booking?")) {
-                        db.collection("users").doc(auth.currentUser.uid)
-                          .collection("bookings").doc(this.getAttribute('data-doc-id'))
-                          .delete().then(() => location.reload());
+                    if(confirm("Cancel?")) {
+                        db.collection("users").doc(auth.currentUser.uid).collection("bookings").doc(this.getAttribute('data-doc-id')).delete().then(() => location.reload());
                     }
                 });
             });
-            
-            // --- OPTIONAL: Make "Download Receipt" do the same thing ---
-            document.querySelectorAll('.btn-receipt').forEach(btn => {
-                btn.addEventListener('click', function() {
-                   // You can copy the PDF logic here if you want this button to work too
-                   alert("Please click 'View Details' to download the PDF invoice.");
-                });
-            });
+            document.querySelectorAll('.btn-receipt').forEach(btn => btn.addEventListener('click', () => alert("Receipt download started...")));
         }
+    }
 
     // ---------------------------------------------------------
     // 6. SUPPORT PAGE LOGIC (CORRECTLY PLACED INSIDE!)
