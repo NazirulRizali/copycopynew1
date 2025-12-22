@@ -619,3 +619,45 @@ select#pickup-location option {
     text-decoration: underline !important;
     color: #f39c12 !important;
 }
+
+
+/* =========================================
+   Flatpickr (Calendar) Customization
+   ========================================= */
+
+/* 1. Force the Calendar and Time Picker to be Side-by-Side */
+.flatpickr-calendar.hasTime {
+    width: auto !important; /* Let it grow to fit both */
+    display: flex !important;
+    flex-direction: row;    /* Align children in a row */
+}
+
+/* 2. The Calendar Grid (Left Side) */
+.flatpickr-innerContainer {
+    order: 1; /* First item */
+}
+
+/* 3. The Time Picker (Right Side) */
+.flatpickr-time {
+    order: 2; /* Second item */
+    border-top: none !important;
+    border-left: 1px solid #e6e6e6; /* Divider line */
+    height: auto !important;        /* Match height of calendar */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 100px;               /* Give it enough space */
+}
+
+/* 4. Center the numbers inside the time picker */
+.flatpickr-time .numInputWrapper {
+    width: 100%;
+    margin: 5px 0;
+}
+
+/* 5. Fix arrow colors if they are hard to see */
+.flatpickr-time .flatpickr-am-pm {
+    height: auto !important;
+    padding: 5px 0;
+    cursor: pointer;
+}
