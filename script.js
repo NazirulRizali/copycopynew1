@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - FINAL VERSION (Login Check + Payment Modal)
+   script.js - FINAL (Login + Reset Password + Payment)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -164,8 +164,65 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================
-    // 3. AUTH LOGIC
+    // 3. AUTH LOGIC (SIGNUP, LOGIN & RESET)
     // =========================================================
+    
+    // --- RESET PASSWORD LOGIC (New) ---
+    const forgotLink = document.getElementById('link-forgot-pass');
+    const resetModal = document.getElementById('reset-modal');
+    const closeResetBtn = document.getElementById('close-reset-modal');
+    const sendResetBtn = document.getElementById('btn-send-reset');
+
+    if (forgotLink) {
+        forgotLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            // Optional: Pre-fill email from login box
+            const loginEmail = document.getElementById('login-email');
+            const resetInput = document.getElementById('reset-email-input');
+            if(loginEmail && resetInput && loginEmail.value) {
+                resetInput.value = loginEmail.value;
+            }
+            if(resetModal) resetModal.style.display = 'flex';
+        });
+    }
+
+    if (closeResetBtn) {
+        closeResetBtn.addEventListener('click', () => {
+            if(resetModal) resetModal.style.display = 'none';
+        });
+        window.addEventListener('click', (e) => {
+            if (e.target == resetModal) resetModal.style.display = 'none';
+        });
+    }
+
+    if (sendResetBtn) {
+        sendResetBtn.addEventListener('click', () => {
+            const email = document.getElementById('reset-email-input').value;
+
+            if (!email) {
+                alert("Please enter your email address.");
+                return;
+            }
+
+            sendResetBtn.textContent = "Sending...";
+            sendResetBtn.disabled = true;
+
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    alert("Password reset email sent! Check your inbox.");
+                    resetModal.style.display = 'none';
+                    sendResetBtn.textContent = "Send Reset Link";
+                    sendResetBtn.disabled = false;
+                })
+                .catch((error) => {
+                    alert("Error: " + error.message);
+                    sendResetBtn.textContent = "Send Reset Link";
+                    sendResetBtn.disabled = false;
+                });
+        });
+    }
+
+    // --- SIGN UP LOGIC ---
     const signupBtn = document.getElementById('btn-signup-action');
     if (signupBtn) {
         signupBtn.addEventListener('click', (e) => {
@@ -194,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- LOGIN LOGIC ---
     const loginBtn = document.getElementById('btn-login-action');
     if (loginBtn) {
         loginBtn.addEventListener('click', (e) => {
@@ -205,7 +263,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 auth.signInWithEmailAndPassword(email, pass)
                     .then((userCredential) => {
                         if (userCredential.user.emailVerified) {
-                            // If coming from login page, go home
                             window.location.href = 'index.html';
                         } else {
                             alert("Please verify your email first.");
@@ -229,82 +286,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             if (path.includes('login')) window.location.href = 'index.html';
         } else {
-            // CHANGED: Removed 'booking' from strict redirect so guests can view price
             if (!isPublic && path.includes('my-bookings')) {
                 window.location.href = 'login.html';
             }
         }
     });
 
-   // =========================================================
-    // 3. AUTH LOGIC (Updated with Reset Password)
-    // =========================================================
-
-    // ... (Your existing Signup and Login Logic remains here) ...
-
-    // --- NEW: RESET PASSWORD LOGIC ---
-    const forgotLink = document.getElementById('link-forgot-pass');
-    const resetModal = document.getElementById('reset-modal');
-    const closeResetBtn = document.getElementById('close-reset-modal');
-    const sendResetBtn = document.getElementById('btn-send-reset');
-
-    // 1. Open Modal
-    if (forgotLink) {
-        forgotLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            // Pre-fill email if user typed it in login box
-            const loginEmail = document.getElementById('login-email');
-            const resetInput = document.getElementById('reset-email-input');
-            if(loginEmail && resetInput && loginEmail.value) {
-                resetInput.value = loginEmail.value;
-            }
-            resetModal.style.display = 'flex';
-        });
-    }
-
-    // 2. Close Modal
-    if (closeResetBtn) {
-        closeResetBtn.addEventListener('click', () => {
-            resetModal.style.display = 'none';
-        });
-        window.addEventListener('click', (e) => {
-            if (e.target == resetModal) resetModal.style.display = 'none';
-        });
-    }
-
-    // 3. Send Firebase Reset Email
-    if (sendResetBtn) {
-        sendResetBtn.addEventListener('click', () => {
-            const email = document.getElementById('reset-email-input').value;
-
-            if (!email) {
-                alert("Please enter your email address.");
-                return;
-            }
-
-            sendResetBtn.textContent = "Sending...";
-            sendResetBtn.disabled = true;
-
-            auth.sendPasswordResetEmail(email)
-                .then(() => {
-                    alert("Password reset email sent! Check your inbox.");
-                    resetModal.style.display = 'none';
-                    sendResetBtn.textContent = "Send Reset Link";
-                    sendResetBtn.disabled = false;
-                })
-                .catch((error) => {
-                    alert("Error: " + error.message);
-                    sendResetBtn.textContent = "Send Reset Link";
-                    sendResetBtn.disabled = false;
-                });
-        });
-    }
-
     // =========================================================
     // 4. BOOKING FLOW (MODAL PAYMENT)
     // =========================================================
-
-    // Search & Select Car Logic
     const searchBtn = document.getElementById('search-btn');
     if (searchBtn) {
         searchBtn.addEventListener('click', (e) => {
@@ -324,7 +314,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- BOOKING PAGE LOGIC ---
     const bookingSummary = document.querySelector('.booking-card');
     if (bookingSummary) {
         const location = sessionStorage.getItem('rentalLocation') || "Kuala Lumpur Intl Airport (KUL)";
@@ -350,17 +339,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('display-rental-fee').textContent = `RM${rentalFee.toFixed(2)}`;
         document.getElementById('display-total').textContent = `RM${total.toFixed(2)}`;
         
-        // "Confirm & Pay" Button
         const payBtn = document.getElementById('btn-pay-text');
         payBtn.textContent = `Confirm & Pay RM${total.toFixed(2)}`;
 
-        // Modal Elements
         const modal = document.getElementById('payment-modal');
         const closeModal = document.getElementById('close-modal');
         const finalPayBtn = document.getElementById('btn-final-pay');
         let selectedMethod = null;
 
-        // 1. OPEN MODAL (Check Login First)
         payBtn.addEventListener('click', () => {
              if (!auth.currentUser) { 
                  alert("You must log in first to complete your booking.\n\nRedirecting you to Login page...");
@@ -373,7 +359,6 @@ document.addEventListener('DOMContentLoaded', () => {
         closeModal.addEventListener('click', () => { modal.style.display = 'none'; });
         window.addEventListener('click', (e) => { if (e.target == modal) modal.style.display = 'none'; });
 
-        // 2. SELECT PAYMENT METHOD
         window.selectPayment = function(element, method) {
             document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
             element.classList.add('selected');
@@ -383,7 +368,6 @@ document.addEventListener('DOMContentLoaded', () => {
             finalPayBtn.style.cursor = "pointer";
         };
 
-        // 3. FINAL PAY BUTTON
         finalPayBtn.addEventListener('click', () => {
             if (!selectedMethod) return;
 
