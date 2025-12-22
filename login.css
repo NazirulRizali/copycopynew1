@@ -38,6 +38,14 @@ body {
 /* =========================================
    CONTENT WRAPPER
    ========================================= */
+.logo-text {
+    font-size: 36px;       /* Size of the text */
+    font-weight: bold;     /* Make it thick like the logo */
+    margin-bottom: 20px;   /* Space below the logo */
+    font-family: 'Arial Black', sans-serif; /* Thick font style */
+}
+
+
 .login-wrapper {
     position: relative;
     z-index: 1;        /* Forces form to stay above the video */
@@ -132,9 +140,4 @@ body {
     text-decoration: underline;
 }
 
-.logo-text {
-    font-size: 36px;       /* Size of the text */
-    font-weight: bold;     /* Make it thick like the logo */
-    margin-bottom: 20px;   /* Space below the logo */
-    font-family: 'Arial Black', sans-serif; /* Thick font style */
-}
+
