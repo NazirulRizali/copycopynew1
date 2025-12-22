@@ -111,6 +111,10 @@ body {
     margin-bottom: 1.5rem;
 }
 
+.input-group {
+    margin-bottom: 1rem; /* Added general margin for inputs */
+}
+
 .input-group label {
     display: block;
     color: var(--text-gray);
@@ -124,8 +128,9 @@ body {
     align-items: center;
 }
 
-/* Standard Inputs */
-.input-wrapper input {
+/* Standard Inputs & Dark Inputs */
+.input-wrapper input, 
+.dark-input {
     width: 100%;
     background-color: #262f40;
     border: 1px solid #4b5563;
@@ -136,7 +141,8 @@ body {
     outline: none;
 }
 
-.input-wrapper input:focus {
+.input-wrapper input:focus,
+.dark-input:focus {
     border-color: var(--accent-orange);
 }
 
@@ -503,20 +509,17 @@ select.dark-input option, select#pickup-location option {
 }
 
 /* =========================================
-   9. FLATPICKR (CALENDAR) - TARGET DARK THEME
+   9. FLATPICKR (CALENDAR)
    ========================================= */
-
-/* 1. Main Container & Background */
 .flatpickr-calendar {
-    background: #1f2937 !important; /* Dark Grey Background */
+    background: #1f2937 !important;
     border: 1px solid #374151 !important;
     box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
     color: white !important;
     font-family: 'Inter', sans-serif !important;
-    width: 310px !important; /* Fixed width prevents squishing */
+    width: 310px !important;
 }
 
-/* 2. Header (Month & Year) */
 .flatpickr-month {
     background: #1f2937 !important;
     color: white !important;
@@ -536,51 +539,45 @@ select.dark-input option, select#pickup-location option {
     background: transparent !important;
 }
 
-/* 3. Arrows (Left/Right) */
 .flatpickr-prev-month, .flatpickr-next-month {
-    fill: white !important; /* Make arrows white */
+    fill: white !important;
     color: white !important;
     top: 15px !important;
 }
 .flatpickr-prev-month:hover svg, .flatpickr-next-month:hover svg {
-    fill: #c84e08 !important; /* Orange on hover */
+    fill: #c84e08 !important;
 }
 
-/* 4. Weekdays (Sun, Mon...) */
 .flatpickr-weekdays {
     background: #1f2937 !important;
 }
 span.flatpickr-weekday {
-    color: #9ca3af !important; /* Light Gray */
+    color: #9ca3af !important;
     font-weight: 600 !important;
 }
 
-/* 5. Days (The Numbers) */
 .flatpickr-day {
     color: #e2e8f0 !important;
     font-weight: 500;
 }
 
-/* Hover Effect */
 .flatpickr-day:hover {
     background: #374151 !important;
     border-color: #374151 !important;
 }
 
-/* 6. Selected Date (The Orange Circle) */
 .flatpickr-day.selected, 
 .flatpickr-day.startRange, 
 .flatpickr-day.endRange, 
 .flatpickr-day.selected.inRange, 
 .flatpickr-day.selected:focus, 
 .flatpickr-day.selected:hover {
-    background: #3b82f6 !important; /* Use Blue like your target image (or use #c84e08 for Orange) */
-    border-color: #3b82f6 !important;
+    background: #c84e08 !important; /* Changed to Orange to match theme */
+    border-color: #c84e08 !important;
     color: white !important;
     font-weight: bold;
 }
 
-/* 7. Time Picker (Fixed to Bottom) */
 .flatpickr-time {
     border-top: 1px solid #374151 !important;
     padding: 10px !important;
@@ -605,7 +602,64 @@ span.flatpickr-weekday {
     cursor: pointer;
 }
 
-/* 8. Reset Layout Conflicts */
 .flatpickr-innerContainer {
-    display: block !important; /* Stop the side-by-side layout */
+    display: block !important;
+}
+
+/* =========================================
+   10. LOGIN / SIGNUP BACKGROUND & FORMS
+   ========================================= */
+.bg-image {
+    /* 1. The Image & The Dark Overlay */
+    background-image: 
+        linear-gradient(rgba(15, 18, 25, 0.6), rgba(15, 18, 25, 0.8)), /* Dark overlay */
+        url('images/background.png'); /* Your photo */
+
+    /* 2. Positioning */
+    background-size: cover;        /* Stretch to fill screen */
+    background-position: center;   /* Center the interesting parts */
+    background-repeat: no-repeat;  /* Do not tile */
+    background-attachment: fixed;  /* Keep background still when scrolling */
+    
+    /* 3. Layout Centering */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* Reusing 'search-card' styles for the 'form-card' used in Login */
+.form-card {
+    background-color: var(--card-dark);
+    padding: 2.5rem;
+    border-radius: 8px;
+    border: 1px solid #1e2636;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    width: 100%; /* Ensures it fills the container in the login page */
+}
+
+.form-card h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.35rem;
+    font-weight: 700;
+    text-align: center; /* Center the title on forms */
+}
+
+/* Submit Button Logic for Forms */
+.btn-submit {
+    width: 100%;
+    background-color: var(--accent-orange);
+    color: white;
+    border: none;
+    padding: 0.9rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 1rem;
+}
+
+.btn-submit:hover {
+    background-color: #a84206;
 }
