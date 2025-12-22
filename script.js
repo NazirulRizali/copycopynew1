@@ -511,21 +511,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // =========================================================
-    // 6. SUPPORT PAGE LOGIC
+    // 6. SUPPORT PAGE LOGIC (Auto-fill & Send)
     // =========================================================
     const supportForm = document.getElementById('support-form');
+    
+    // Only run this if we are on the Support page
     if (supportForm) {
-        // Auto-fill email if logged in
+        
+        // 1. AUTO-FILL LOGIC
         auth.onAuthStateChanged(user => {
             if (user) {
-                document.getElementById('sup-email').value = user.email;
-                // We'll need to fetch the name from Firestore if you want to pre-fill name too
-                db.collection("users").doc(user.uid).get().then(doc => {
-                    if (doc.exists) document.getElementById('sup-name').value = doc.data().fullName;
-                });
+                // Fill Email from Auth
+                const emailField = document.getElementById('sup-email');
+                if(emailField) emailField.value = user.email;
+
+                // Fill Name from Database (Firestore)
+                db.collection("users").doc(user.uid).get().then((doc) => {
+                    if (doc.exists) {
+                        const nameField = document.getElementById('sup-name');
+                        if(nameField) nameField.value = doc.data().fullName;
+                    }
+                }).catch(err => console.log("Error getting user info:", err));
             }
         });
 
+        // 2. SEND MESSAGE LOGIC
         supportForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
@@ -538,7 +548,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = "Sending...";
             btn.disabled = true;
 
-            // Save to Firestore 'messages' collection
             db.collection("messages").add({
                 name: name,
                 email: email,
@@ -549,6 +558,13 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(() => {
                 alert("Message sent successfully! We will contact you shortly.");
                 supportForm.reset();
+                // Re-fill info after reset if user is still logged in
+                if (auth.currentUser) {
+                     document.getElementById('sup-email').value = auth.currentUser.email;
+                     db.collection("users").doc(auth.currentUser.uid).get().then(doc => {
+                        if(doc.exists) document.getElementById('sup-name').value = doc.data().fullName;
+                     });
+                }
                 btn.textContent = "Send Message";
                 btn.disabled = false;
             })
