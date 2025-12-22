@@ -511,31 +511,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // =========================================================
-    // 6. SUPPORT PAGE LOGIC (Auto-fill & Send)
+    // 6. SUPPORT PAGE LOGIC (DEBUG VERSION)
     // =========================================================
     const supportForm = document.getElementById('support-form');
     
-    // Only run this if we are on the Support page
     if (supportForm) {
-        
-        // 1. AUTO-FILL LOGIC
+        // Run this when Auth state is confirmed
         auth.onAuthStateChanged(user => {
             if (user) {
-                // Fill Email from Auth
-                const emailField = document.getElementById('sup-email');
-                if(emailField) emailField.value = user.email;
+                console.log("Support Page: User is logged in:", user.email);
 
-                // Fill Name from Database (Firestore)
-                db.collection("users").doc(user.uid).get().then((doc) => {
+                // 1. Fill Email from Authentication (Easy part)
+                const emailField = document.getElementById('sup-email');
+                if(emailField) {
+                    emailField.value = user.email;
+                    // Lock the field so they know it's auto-filled (optional)
+                    emailField.readOnly = true; 
+                    emailField.style.opacity = "0.7";
+                }
+
+                // 2. Fill Name from Firestore Database (Harder part)
+                console.log("Support Page: Fetching user profile for UID:", user.uid);
+                
+                db.collection("users").doc(user.uid).get()
+                .then((doc) => {
                     if (doc.exists) {
+                        const userData = doc.data();
+                        console.log("Support Page: User data found:", userData);
+                        
                         const nameField = document.getElementById('sup-name');
-                        if(nameField) nameField.value = doc.data().fullName;
+                        if (nameField) {
+                            // Check if 'fullName' exists, otherwise try 'name'
+                            const realName = userData.fullName || userData.name || "";
+                            nameField.value = realName;
+                            
+                            if(realName) console.log("Support Page: Name field updated to", realName);
+                            else console.warn("Support Page: 'fullName' field is missing in database!");
+                        }
+                    } else {
+                        console.log("Support Page: No user document found in 'users' collection.");
                     }
-                }).catch(err => console.log("Error getting user info:", err));
+                })
+                .catch((error) => {
+                    console.error("Support Page: Error getting user info:", error);
+                });
+            } else {
+                console.log("Support Page: No user is logged in.");
             }
         });
 
-        // 2. SEND MESSAGE LOGIC
+        // SEND MESSAGE LOGIC
         supportForm.addEventListener('submit', (e) => {
             e.preventDefault();
             
@@ -553,23 +578,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 email: email,
                 subject: subject,
                 message: message,
+                userId: auth.currentUser ? auth.currentUser.uid : "guest",
                 createdAt: new Date()
             })
             .then(() => {
-                alert("Message sent successfully! We will contact you shortly.");
+                alert("Message sent successfully!");
                 supportForm.reset();
-                // Re-fill info after reset if user is still logged in
+                // Re-populate if logged in
                 if (auth.currentUser) {
-                     document.getElementById('sup-email').value = auth.currentUser.email;
-                     db.collection("users").doc(auth.currentUser.uid).get().then(doc => {
-                        if(doc.exists) document.getElementById('sup-name').value = doc.data().fullName;
-                     });
+                    document.getElementById('sup-email').value = auth.currentUser.email;
+                    // Trigger the fetch again or just leave name as is
+                    window.location.reload(); 
                 }
                 btn.textContent = "Send Message";
                 btn.disabled = false;
             })
             .catch((error) => {
-                alert("Error sending message: " + error.message);
+                alert("Error: " + error.message);
                 btn.textContent = "Send Message";
                 btn.disabled = false;
             });
