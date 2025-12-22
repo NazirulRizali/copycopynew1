@@ -547,5 +547,74 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+   // ---------------------------------------------------------
+    // 7. PROFILE PAGE LOGIC (NEW)
+    // ---------------------------------------------------------
+    const profileForm = document.getElementById('profile-form');
+    if (profileForm) {
+        // A. Load User Data
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // Fill Email (Auth Data)
+                document.getElementById('pro-email').value = user.email;
+
+                // Fill Other Details (Firestore Data)
+                db.collection("users").doc(user.uid).get().then((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        document.getElementById('pro-name').value = data.fullName || "";
+                        document.getElementById('pro-phone').value = data.phone || "";
+                        document.getElementById('pro-age').value = data.age || "";
+                        document.getElementById('pro-country').value = data.country || "MY";
+                    }
+                }).catch(err => console.error("Error fetching profile:", err));
+            } else {
+                // If not logged in, kick them out
+                window.location.href = 'login.html';
+            }
+        });
+
+        // B. Save Changes
+        profileForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = profileForm.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            btn.textContent = "Saving...";
+            btn.disabled = true;
+
+            const user = auth.currentUser;
+            if (user) {
+                db.collection("users").doc(user.uid).update({
+                    fullName: document.getElementById('pro-name').value,
+                    phone: document.getElementById('pro-phone').value,
+                    age: document.getElementById('pro-age').value,
+                    country: document.getElementById('pro-country').value
+                }).then(() => {
+                    alert("Profile updated successfully!");
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }).catch((err) => {
+                    alert("Error updating profile: " + err.message);
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                });
+            }
+        });
+
+        // C. Trigger Password Reset Email
+        const resetPassBtn = document.getElementById('btn-reset-pass-profile');
+        if (resetPassBtn) {
+            resetPassBtn.addEventListener('click', () => {
+                const user = auth.currentUser;
+                if (user && user.email) {
+                    if(confirm("Send a password reset link to " + user.email + "?")) {
+                        auth.sendPasswordResetEmail(user.email)
+                            .then(() => alert("Reset link sent! Check your email."))
+                            .catch(err => alert(err.message));
+                    }
+                }
+            });
+        }
+    }
 // CLOSING BRACKET FOR DOMContentLoaded
 });
