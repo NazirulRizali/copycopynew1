@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - COMPLETE (Auth, Booking, Support, Location)
+   script.js - COMPLETE (Auth, Booking, Support, Location, Validation)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
             L.marker([ap.lat, ap.lng], { icon: carIcon }).addTo(map).bindPopup(`<b>${ap.name}</b><br>Available`);
         });
 
-        // --- NEW: USER LOCATION LOGIC ---
+        // --- USER LOCATION LOGIC ---
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(pos => {
                 const userIcon = L.icon({
@@ -248,15 +248,29 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ---------------------------------------------------------
-    // 4. BOOKING & PAYMENT LOGIC
+    // 4. BOOKING & PAYMENT LOGIC (UPDATED WITH RESTRICTION)
     // ---------------------------------------------------------
     const searchBtn = document.getElementById('search-btn');
     if (searchBtn) {
         searchBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            sessionStorage.setItem('rentalLocation', document.getElementById('pickup-location').value);
-            sessionStorage.setItem('pickupDate', document.getElementById('pickup-date').value);
-            sessionStorage.setItem('dropoffDate', document.getElementById('dropoff-date').value);
+
+            // 1. Get Values
+            const locationVal = document.getElementById('pickup-location').value;
+            const pickupVal = document.getElementById('pickup-date').value;
+            const dropoffVal = document.getElementById('dropoff-date').value;
+
+            // 2. CHECK: RESTRICTION
+            // If any value is missing, Alert and Stop.
+            if (!locationVal || !pickupVal || !dropoffVal) {
+                alert("Please select a Pick-up Location, Pick-up Date, and Drop-off Date to continue.");
+                return; // Stop execution here
+            }
+
+            // 3. Save & Redirect (Only happens if check passes)
+            sessionStorage.setItem('rentalLocation', locationVal);
+            sessionStorage.setItem('pickupDate', pickupVal);
+            sessionStorage.setItem('dropoffDate', dropoffVal);
             window.location.href = 'car-list.html';
         });
     }
