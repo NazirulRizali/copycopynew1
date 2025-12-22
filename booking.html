@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking & Payment</title>
+    
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="booking.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,7 +18,12 @@
 <body>
     <nav class="navbar">
         <div class="logo"><span class="logo-orange">SafeRent</span> <span class="logo-white">Car</span></div>
-        <div class="nav-links"><a href="my-bookings.html">My Bookings</a><a href="support.html">Support</a><a href="#" class="btn-logout">Logout</a></div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="my-bookings.html">My Bookings</a>
+            <a href="support.html">Support</a>
+            <a href="#" class="btn-logout">Logout</a>
+        </div>
     </nav>
 
     <main class="container">
@@ -57,28 +63,6 @@
                     <div class="price-total">
                         <span>Total:</span>
                         <span class="total-amount" id="display-total">...</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="payment-section">
-                <h4>Contact Information</h4>
-                <div class="payment-form-box">
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label>Country Code</label>
-                            <select class="dark-input"><option>+1</option><option>+60</option></select>
-                        </div>
-                        <div class="input-group">
-                            <label>Phone Number</label>
-                            <input type="text" class="dark-input" placeholder="123 456 7890">
-                        </div>
-                        <div class="input-group full-width">
-                            <label>Card Number (Optional if using other methods)</label>
-                            <input type="text" class="dark-input" placeholder="Card Number">
-                        </div>
-                        <div class="input-group"><label>MM/YY</label><input type="text" class="dark-input"></div>
-                        <div class="input-group"><label>CVC</label><input type="text" class="dark-input"></div>
                     </div>
                 </div>
             </div>
