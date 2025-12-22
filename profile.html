@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - SafeRent Car</title>
+    
+    <link rel="stylesheet" href="styles.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-orange">SafeRent</span> <span class="logo-white">Car</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="my-bookings.html">My Bookings</a>
+            <a href="#" class="active-link" style="color:white">Profile</a>
+            <a href="support.html">Support</a>
+            <a href="#" class="btn-logout">Logout</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="search-card" style="max-width: 600px; margin: 0 auto;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+                <h2>My Profile</h2>
+                <div style="background: #c84e08; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold;">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+            </div>
+
+            <form id="profile-form">
+                <div class="input-group full-width">
+                    <label>Full Name</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="pro-name" placeholder="Loading..." required>
+                        <i class="fa-regular fa-id-card"></i>
+                    </div>
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Email Address (Cannot be changed)</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="pro-email" placeholder="Loading..." disabled style="opacity: 0.6; cursor: not-allowed;">
+                        <i class="fa-regular fa-envelope"></i>
+                    </div>
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Phone Number (e.g., +60 123456789)</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="pro-phone" placeholder="Loading..." required>
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="input-group">
+                        <label>Age</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="pro-age" placeholder="18" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Country</label>
+                        <div class="input-wrapper">
+                            <select id="pro-country" class="dark-input">
+                                <option value="MY">Malaysia</option>
+                                <option value="US">United States</option>
+                                <option value="UK">United Kingdom</option>
+                                <option value="SG">Singapore</option>
+                                <option value="ID">Indonesia</option>
+                                </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <button type="submit" class="btn-search" style="flex: 1;">Save Changes</button>
+                    <button type="button" id="btn-reset-pass-profile" class="btn-search" style="flex: 1; background-color: #374151;">Reset Password</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 SafeRent Car. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
