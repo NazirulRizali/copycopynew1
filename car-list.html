@@ -9,27 +9,33 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <nav class="navbar">
         <div class="logo"><span class="logo-orange">SafeRent</span> <span class="logo-white">Car</span></div>
         <div class="nav-links">
-            <a href="#">My Bookings</a><a href="support.html">Support</a><a href="#" class="btn-logout">Logout</a>
+            <a href="#">My Bookings</a>
+            <a href="support.html">Support</a>
+            <a href="#" class="btn-logout">Logout</a>
         </div>
     </nav>
 
     <main class="container">
-        <div class="page-header"><h1>CAR LIST</h1></div>
+        <div class="page-header">
+            <h1>CAR LIST</h1>
+        </div>
 
         <section class="car-section">
             <h3>Economy & Compact</h3>
             <div class="car-grid">
+                
                 <div class="car-card">
-                    <div class="car-image-box"><span class="img-text-large">Vios</span></div>
+                    <div class="car-image-box">
+                        <img src="vios.jpg" alt="Toyota Vios" class="car-img">
+                    </div>
                     <div class="car-details">
                         <h4>Toyota Vios</h4>
                         <p class="price">RM35 <span class="per-day">/ day</span></p>
@@ -39,39 +45,48 @@
                 </div>
 
                 <div class="car-card">
-                    <div class="car-image-box"><span class="img-text-medium">Honda City</span></div>
+                    <div class="car-image-box">
+                        <img src="honda-city.jpg" alt="Honda City" class="car-img">
+                    </div>
                     <div class="car-details">
                         <h4>Honda City</h4>
                         <p class="price">RM40 <span class="per-day">/ day</span></p>
-                        <p class="description">Reliable, modern sedan.</p>
+                        <p class="description">Reliable, modern sedan with premium comfort.</p>
                         <button class="btn-select" data-name="Honda City" data-price="40">Select</button>
                     </div>
                 </div>
 
                 <div class="car-card">
-                    <div class="car-image-box"><span class="img-text-small">Hatchback</span></div>
+                    <div class="car-image-box">
+                        <img src="renault-clio.jpg" alt="Renault Clio" class="car-img">
+                    </div>
                     <div class="car-details">
                         <h4>Renault Clio</h4>
                         <p class="price">RM30 <span class="per-day">/ day</span></p>
-                        <p class="description">Best budget option.</p>
+                        <p class="description">Compact hatchback, best budget option.</p>
                         <button class="btn-select" data-name="Renault Clio" data-price="30">Select</button>
                     </div>
                 </div>
+
             </div>
         </section>
 
         <section class="car-section">
             <h3>Sports & Performance</h3>
             <div class="car-grid">
+                
                 <div class="car-card">
-                    <div class="car-image-box"><span class="img-text-large">Mustang</span></div>
+                    <div class="car-image-box">
+                        <img src="mustang.jpg" alt="Ford Mustang GT" class="car-img">
+                    </div>
                     <div class="car-details">
                         <h4>Ford Mustang GT</h4>
                         <p class="price">RM120 <span class="per-day">/ day</span></p>
-                        <p class="description">High performance.</p>
+                        <p class="description">High performance V8 engine for an iconic drive.</p>
                         <button class="btn-select" data-name="Ford Mustang GT" data-price="120">Select</button>
                     </div>
                 </div>
+
             </div>
         </section>
 
@@ -82,7 +97,9 @@
         </div>
     </main>
 
-    <footer><p>&copy; 2025 SafeRent Car. All rights reserved.</p></footer>
+    <footer>
+        <p>&copy; 2025 SafeRent Car. All rights reserved.</p>
+    </footer>
     
     <script src="script.js"></script>
 </body>
