@@ -116,3 +116,30 @@
         grid-template-columns: 1fr;
     }
 }
+
+
+/* Fix for Message Box Styling */
+textarea.dark-input {
+    background-color: #262f40 !important; /* Matches your other inputs */
+    border: 1px solid #4b5563;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    outline: none;
+    width: 100%;
+    resize: vertical; /* Allows user to resize if they want */
+    
+    /* "Add little high" - Making it taller */
+    min-height: 150px; 
+    font-family: 'Inter', sans-serif; /* Ensures font matches the rest */
+}
+
+textarea.dark-input:focus {
+    border-color: #c84e08; /* Orange border when clicking */
+}
+
+/* Ensure placeholders are visible */
+textarea.dark-input::placeholder {
+    color: #9ca3af;
+}
