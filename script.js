@@ -1,11 +1,11 @@
 /* =========================================
-   script.js - COMPLETE (Auth, Booking, Support)
+   script.js - COMPLETE (Auth, Booking, Support, Location)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
 
     // ---------------------------------------------------------
-    // 0. FIREBASE CONFIGURATION (Must be inside here!)
+    // 0. FIREBASE CONFIGURATION
     // ---------------------------------------------------------
     const firebaseConfig = {
         apiKey: "AIzaSyAz5jt1yefwtZC0W2WvCMD7YHh31U7ZL0g",
@@ -116,6 +116,18 @@ document.addEventListener('DOMContentLoaded', () => {
         airports.forEach(ap => {
             L.marker([ap.lat, ap.lng], { icon: carIcon }).addTo(map).bindPopup(`<b>${ap.name}</b><br>Available`);
         });
+
+        // --- NEW: USER LOCATION LOGIC ---
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                const userIcon = L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                    iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+                });
+                L.marker([pos.coords.latitude, pos.coords.longitude], { icon: userIcon }).addTo(map).bindPopup("<b>You</b>");
+            }, () => console.log("Geo denied"));
+        }
     }
 
     // ---------------------------------------------------------
