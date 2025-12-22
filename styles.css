@@ -192,7 +192,7 @@ body {
     background-color: var(--card-dark);
     border: 1px solid #1e2636;
     border-radius: 8px;
-    padding: 1.2rem; /* Slightly reduced padding for a tighter landscape feel */
+    padding: 1.2rem;
     display: flex;
     flex-direction: column;
     transition: transform 0.2s ease;
@@ -202,25 +202,23 @@ body {
     transform: translateY(-5px);
 }
 
-/* Landscape Image Container */
 .card-image-box, .card-image-placeholder {
     background-color: #1c2331;
     width: 100%;
-    aspect-ratio: 16 / 9; /* Forces a perfect landscape 16:9 ratio */
+    aspect-ratio: 16 / 9;
     border-radius: 6px;
-    overflow: hidden; /* Clips the image to the border radius */
+    overflow: hidden;
     margin-bottom: 1.2rem;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Ensures the actual image fills the landscape box correctly */
 .offer-img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* This prevents the image from stretching */
-    object-position: center; /* Centers the car in the frame */
+    object-fit: cover;
+    object-position: center;
 }
 
 .card-content h4 {
@@ -234,7 +232,7 @@ body {
     font-size: 0.85rem;
     line-height: 1.4;
     margin-bottom: 1.2rem;
-    min-height: 3rem; /* Adjusted for landscape text flow */
+    min-height: 3rem;
 }
 
 .link-book {
@@ -245,7 +243,7 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: auto; /* Pushes link to the bottom of the card */
+    margin-top: auto;
     transition: color 0.2s;
 }
 
@@ -273,7 +271,7 @@ footer a {
     text-decoration: none;
 }
 
-/* Responsive adjustments */
+/* Responsive */
 @media (max-width: 768px) {
     .search-grid, .offers-grid {
         grid-template-columns: 1fr;
@@ -309,7 +307,6 @@ footer a {
     z-index: 1;
 }
 
-/* Custom Popup Styles for Map */
 .leaflet-popup-content-wrapper {
     background: #1f2937;
     color: #fff;
@@ -323,151 +320,40 @@ footer a {
 }
 
 /* =========================================
-   7. CUSTOM FLATPICKR STYLE (Side-by-Side)
+   7. DROPDOWN STYLES
    ========================================= */
-
-.flatpickr-calendar {
-    width: 480px !important;
-    padding: 10px;
-}
-
-.flatpickr-innerContainer {
-    display: flex;
-    flex-direction: row;
-}
-
-.flatpickr-rContainer {
-    display: inline-block;
-    width: 310px;
-    border-right: 1px solid #e6e6e6;
-    padding-right: 10px;
-}
-
-.flatpickr-time {
-    display: flex !important;
-    flex-direction: column;
-    justify-content: center;
-    width: 130px !important;
-    height: auto !important;
-    border-top: none !important;
-    padding-left: 10px;
-}
-
-.flatpickr-time .flatpickr-time-separator,
-.flatpickr-time .numInputWrapper {
-    color: #333;
-    font-weight: bold;
-}
-
-.flatpickr-time input.flatpickr-hour, 
-.flatpickr-time input.flatpickr-minute,
-.flatpickr-time .flatpickr-am-pm {
-    background: #007bff;
-    color: white !important;
-    border-radius: 4px;
-    margin-bottom: 5px;
-    height: 40px;
-    line-height: 40px;
-    border: none;
-}
-.flatpickr-time input:focus {
-    background: #0056b3;
-}
-
-.flatpickr-footer {
-    display: flex;
-    justify-content: space-between;
-    padding-top: 10px;
-    border-top: 1px solid #e6e6e6;
-    margin-top: 10px;
-}
-
-.flatpickr-btn {
-    background: transparent;
-    border: none;
-    color: #007bff;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 14px;
-}
-.flatpickr-btn:hover {
-    text-decoration: underline;
-}
-
-/* =========================================
-   8. NEW: AIRPORT DROPDOWN STYLES
-   ========================================= */
-
-/* Dropdown styling to match existing inputs */
-select.dark-input {
+select.dark-input, select#pickup-location {
     width: 100%;
-    background-color: #262f40; /* Input background color */
+    background-color: #262f40;
     border: 1px solid #4b5563;
     color: #e2e8f0;
     padding: 0.8rem 1rem;
     border-radius: 4px;
     font-size: 0.9rem;
     outline: none;
-    appearance: none; /* Removes standard arrow for cleaner look */
+    appearance: none;
     cursor: pointer;
-    /* Adding a custom arrow here since appearance:none removes it */
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 1rem center;
     background-size: 1em;
 }
 
-select.dark-input:focus {
+select.dark-input:focus, select#pickup-location:focus {
     border-color: var(--accent-orange);
 }
 
-/* Ensure options have dark background (mostly for Windows/Android) */
-select.dark-input option {
-    background-color: #262f40;
-    color: white;
-}
-
-/* =========================================
-   FIXED: DROPDOWN STYLE (Matches Original Input)
-   ========================================= */
-
-/* Force the select to look exactly like the text input */
-select#pickup-location {
-    width: 100%;
-    background-color: #262f40; /* Same dark blue-gray as before */
-    border: 1px solid #4b5563;
-    color: #e2e8f0;
-    padding: 0.8rem 1rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    outline: none;
-    appearance: none; /* Removes the ugly default browser arrow */
-    cursor: pointer;
-    
-    /* Adds a clean white arrow to the right, matching your icons */
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 1rem center;
-    background-size: 1em;
-}
-
-select#pickup-location:focus {
-    border-color: #c84e08; /* Orange border on click */
-}
-
-/* Ensure dropdown options are dark */
-select#pickup-location option {
+select.dark-input option, select#pickup-location option {
     background-color: #1f2937;
     color: white;
     padding: 10px;
 }
 
 /* =========================================
-   PAYMENT MODAL STYLES (COMPLETE)
+   8. PAYMENT MODAL STYLES
    ========================================= */
-
 .modal-overlay {
-    display: none; /* Hidden by default */
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -488,7 +374,7 @@ select#pickup-location option {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     overflow: hidden;
     animation: slideUp 0.3s ease-out;
-    display: flex;       /* Added for footer layout */
+    display: flex;
     flex-direction: column;
 }
 
@@ -541,7 +427,6 @@ select#pickup-location option {
     border-color: #c84e08;
 }
 
-/* Highlight Selected Option */
 .payment-option.selected {
     border: 2px solid #c84e08;
     background-color: #262f40;
@@ -583,7 +468,6 @@ select#pickup-location option {
     transition: color 0.2s;
 }
 
-/* Modal Footer & Pay Button */
 .modal-footer {
     padding: 1rem 1.2rem 1.5rem 1.2rem;
     border-top: 1px solid #374151;
@@ -607,57 +491,144 @@ select#pickup-location option {
     background-color: #a84206;
 }
 
-/* Disabled State (Grayed out) */
 .btn-pay-modal:disabled {
     background-color: #4b5563;
     cursor: not-allowed;
     opacity: 0.7;
 }
 
-/* Add this anywhere in styles.css */
 #link-forgot-pass:hover {
     text-decoration: underline !important;
     color: #f39c12 !important;
 }
 
-
 /* =========================================
-   Flatpickr (Calendar) Customization
+   9. FLATPICKR (CALENDAR) DARK THEME
    ========================================= */
 
-/* 1. Force the Calendar and Time Picker to be Side-by-Side */
-.flatpickr-calendar.hasTime {
-    width: auto !important; /* Let it grow to fit both */
-    display: flex !important;
-    flex-direction: row;    /* Align children in a row */
+/* Main Calendar Container */
+.flatpickr-calendar {
+    background: #1f2937 !important; /* Dark background */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    border: 1px solid #374151 !important;
+    color: #e5e7eb !important; /* Light text color */
+    font-family: 'Inter', sans-serif !important;
+    width: 320px !important; /* Standard width */
 }
 
-/* 2. The Calendar Grid (Left Side) */
-.flatpickr-innerContainer {
-    order: 1; /* First item */
+/* Month & Year Header */
+.flatpickr-month {
+    color: #e5e7eb !important;
+    fill: #e5e7eb !important;
+}
+.flatpickr-current-month .flatpickr-monthDropdown-months,
+.flatpickr-current-month input.cur-year {
+    color: #e5e7eb !important;
+    font-weight: 600;
+}
+.flatpickr-prev-month:hover svg,
+.flatpickr-next-month:hover svg {
+    fill: #c84e08 !important; /* Orange arrows on hover */
 }
 
-/* 3. The Time Picker (Right Side) */
+/* Day Names */
+span.flatpickr-weekday {
+    color: #9ca3af !important;
+    font-weight: 500;
+}
+
+/* The Days */
+.flatpickr-day {
+    color: #e5e7eb !important;
+    border-radius: 50%;
+}
+.flatpickr-day.prevMonthDay, 
+.flatpickr-day.nextMonthDay {
+    color: #4b5563 !important;
+}
+
+/* Selected Date */
+.flatpickr-day.selected, 
+.flatpickr-day.startRange, 
+.flatpickr-day.endRange, 
+.flatpickr-day.selected.inRange, 
+.flatpickr-day.startRange.inRange, 
+.flatpickr-day.endRange.inRange,
+.flatpickr-day.selected:focus,
+.flatpickr-day.selected:hover {
+    background: #c84e08 !important;
+    border-color: #c84e08 !important;
+    color: #ffffff !important;
+    font-weight: 700;
+}
+
+/* The Time Picker Section */
 .flatpickr-time {
-    order: 2; /* Second item */
-    border-top: none !important;
-    border-left: 1px solid #e6e6e6; /* Divider line */
-    height: auto !important;        /* Match height of calendar */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-width: 100px;               /* Give it enough space */
-}
-
-/* 4. Center the numbers inside the time picker */
-.flatpickr-time .numInputWrapper {
-    width: 100%;
-    margin: 5px 0;
-}
-
-/* 5. Fix arrow colors if they are hard to see */
-.flatpickr-time .flatpickr-am-pm {
+    border-top: 1px solid #374151 !important;
+    padding: 1rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
     height: auto !important;
-    padding: 5px 0;
+    border-left: none !important;
+    width: 100% !important;
+}
+
+/* "Time" Label */
+.flatpickr-time::before {
+    content: 'Time';
+    color: #e5e7eb;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-right: auto;
+}
+
+/* Time Input Boxes */
+.flatpickr-time .numInputWrapper {
+    background: #374151 !important;
+    border-radius: 8px;
+    padding: 5px;
+    height: auto !important;
+    color: white !important;
+    width: auto !important;
+}
+.flatpickr-time input.numInput {
+    color: white !important;
+    font-weight: 600;
+    font-size: 1rem;
+}
+.flatpickr-time .flatpickr-am-pm {
+    color: white !important;
+    font-weight: 600;
+    margin-left: 5px;
+    background: #374151;
+    border-radius: 8px;
+    padding: 5px 10px;
+    height: auto !important;
+}
+
+/* Footer Buttons */
+.flatpickr-footer {
+    background: #1f2937;
+    border-top: none;
+    padding: 0 1rem 1rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0 !important;
+}
+.flatpickr-btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
+    font-weight: 600;
     cursor: pointer;
+    border: none;
+}
+.flatpickr-btn:first-child {
+    background: #374151;
+    color: #e5e7eb;
+}
+.flatpickr-btn:last-child {
+    background: #3b82f6;
+    color: white;
 }
