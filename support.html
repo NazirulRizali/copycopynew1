@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Support - SafeRent Car</title>
+    
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="support.css"> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="support.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -19,7 +21,8 @@
         <div class="nav-links">
             <a href="index.html">Home</a>
             <a href="my-bookings.html">My Bookings</a>
-            <a href="#" class="active-link" style="color: white;">Support</a> <a href="#" class="btn-logout">Logout</a>
+            <a href="support.html" class="active-link" style="color: white;">Support</a> 
+            <a href="#" class="btn-logout">Logout</a>
         </div>
     </nav>
 
@@ -56,14 +59,15 @@
                 <form id="support-form">
                     <div class="input-row">
                         <div class="input-group">
-    <label>Your Name</label>
-    <input type="text" id="sup-name" class="dark-input" placeholder="Enter your name" required>
-</div>
-<div class="input-group">
-    <label>Email Address</label>
-    <input type="email" id="sup-email" class="dark-input" placeholder="Enter your email" required>
-</div>
+                            <label>Your Name</label>
+                            <input type="text" id="sup-name" class="dark-input" placeholder="Enter your name" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Email Address</label>
+                            <input type="email" id="sup-email" class="dark-input" placeholder="Enter your email" required>
+                        </div>
                     </div>
+                    
                     <div class="input-group">
                         <label>Subject</label>
                         <select id="sup-subject" class="dark-input">
@@ -73,10 +77,12 @@
                             <option>Other</option>
                         </select>
                     </div>
+                    
                     <div class="input-group">
                         <label>Message</label>
                         <textarea id="sup-message" class="dark-input" rows="5" placeholder="How can we help?" required></textarea>
                     </div>
+                    
                     <button type="submit" class="btn-submit">Send Message</button>
                 </form>
             </div>
