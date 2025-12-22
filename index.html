@@ -19,11 +19,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_blue.css">
 
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
@@ -49,26 +48,29 @@
                     <div class="input-wrapper">
                         <select id="pickup-location" class="dark-input">
                             <option value="" disabled selected>Select Pick-up Location</option>
+                            <option value="KLIA">KLIA Airport</option>
+                            <option value="Penang">Penang Airport</option>
+                            <option value="Subang">Subang Airport</option>
                         </select>
                     </div>
                 </div>
                 <div class="input-group">
                     <label>Pick-up Date</label>
                     <div class="input-wrapper">
-                        <input type="text" id="pickup-date" value="05/12/2025 10:00 AM">
+                        <input type="text" id="pickup-date" placeholder="Select Date & Time">
                         <i class="fa-regular fa-calendar"></i>
                     </div>
                 </div>
                 <div class="input-group">
                     <label>Drop-off Date</label>
                     <div class="input-wrapper">
-                        <input type="text" id="dropoff-date" value="10/12/2025 11:00 AM">
+                        <input type="text" id="dropoff-date" placeholder="Select Date & Time">
                         <i class="fa-regular fa-calendar"></i>
                     </div>
                 </div>
             </div>
 
-            <button id="search-btn" class="btn-search">Search for Cars</button>
+            <button id="search-btn" class="btn-search" onclick="window.location.href='car-list.html'">Search for Cars</button>
         </section>
 
         <section class="map-section">
@@ -82,27 +84,35 @@
 
             <div class="offers-grid">
                 <div class="offer-card">
-                    <div class="card-image-placeholder"><span>Economy Car</span></div>
+                    <div class="card-image-box">
+                        <img src="Economy.jpg" alt="Economy Car Fleet" class="offer-img">
+                    </div>
                     <div class="card-content">
                         <h4>Weekend Special</h4>
-                        <p>Save 20% on any economy class vehicle for 3-day rentals.</p>
-                        <a href="#" class="link-book">Book Now <i class="fa-solid fa-arrow-right"></i></a>
+                        <p>Save 20% on our fuel-efficient economy fleet for 3-day rentals.</p>
+                        <a href="car-list.html" class="link-book">Book Now <i class="fa-solid fa-arrow-right"></i></a>
                     </div>
                 </div>
+
                 <div class="offer-card">
-                    <div class="card-image-placeholder"><span>SUV Vehicle</span></div>
+                    <div class="card-image-box">
+                        <img src="SUV.jpg" alt="SUV Fleet" class="offer-img">
+                    </div>
                     <div class="card-content">
                         <h4>Family Adventure</h4>
-                        <p>15% off all SUVs and minivans for rentals over 5 days.</p>
-                        <a href="#" class="link-book">Book Now <i class="fa-solid fa-arrow-right"></i></a>
+                        <p>15% off all SUVs and all-terrain vehicles for trips over 5 days.</p>
+                        <a href="car-list.html" class="link-book">Book Now <i class="fa-solid fa-arrow-right"></i></a>
                     </div>
                 </div>
+
                 <div class="offer-card">
-                    <div class="card-image-placeholder"><span>Luxury Sedan</span></div>
+                    <div class="card-image-box">
+                        <img src="Sedan.jpg" alt="Luxury Sedan Fleet" class="offer-img">
+                    </div>
                     <div class="card-content">
                         <h4>Premium Travel</h4>
-                        <p>Upgrade to a luxury sedan at the price of a standard car.</p>
-                        <a href="#" class="link-book">Book Now <i class="fa-solid fa-arrow-right"></i></a>
+                        <p>Upgrade to our executive sedan class at standard rental rates.</p>
+                        <a href="car-list.html" class="link-book">Book Now <i class="fa-solid fa-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
@@ -114,13 +124,7 @@
         <p>&copy; 2025 SafeRent Car. All rights reserved.</p>
     </footer>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-     crossorigin=""></script>
-     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>
-
 </body>
 </html>
