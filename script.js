@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - STRICT VERIFICATION VERSION
+   script.js - STRICT VERIFIED ACCESS ONLY
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,12 +24,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!jsPDF) return;
         const doc = new jsPDF();
 
+        // Header
         doc.setFillColor(200, 78, 8); doc.rect(0, 0, 210, 40, 'F'); 
         doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.setFont("helvetica", "bold");
         doc.text("SafeRent Car", 20, 25);
         doc.setFontSize(12); doc.setFont("helvetica", "normal");
         doc.text("Booking Confirmation", 190, 25, { align: "right" });
 
+        // Details
         doc.setTextColor(0, 0, 0); doc.setFontSize(14); doc.text("Rental Details", 20, 60);
         doc.setFontSize(10);
         doc.text("Car Model:", 20, 70); doc.text(booking.carName, 90, 70);
@@ -40,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         doc.setLineWidth(0.5); doc.line(20, 120, 190, 120);
         
+        // Summary
         doc.setFontSize(14); doc.text("Payment Summary", 20, 140);
         doc.setFontSize(10);
         doc.text(`Rental Fee (${diffDays} days):`, 20, 150); doc.text(`RM${rentalFee.toFixed(2)}`, 190, 150, { align: "right" });
@@ -51,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setTextColor(200, 78, 8); 
         doc.text(`RM${booking.totalPrice}`, 190, 190, { align: "right" });
 
+        // Footer
         doc.setTextColor(150, 150, 150); doc.setFontSize(10); doc.setFont("helvetica", "normal");
         doc.text("Thank you for choosing SafeRent Car!", 105, 280, { align: "center" });
 
@@ -157,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =========================================================
-    // 3. AUTH LOGIC (STRICT VERIFICATION)
+    // 3. AUTH LOGIC (STRICT VERIFICATION & PROTECTED DASHBOARD)
     // =========================================================
     
     // --- RESET PASSWORD LOGIC ---
@@ -202,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- SIGN UP LOGIC (Force Logout After Creation) ---
+    // --- SIGN UP LOGIC (Auto-Logout & Redirect) ---
     const signupBtn = document.getElementById('btn-signup-action');
     if (signupBtn) {
         signupBtn.addEventListener('click', (e) => {
@@ -223,11 +227,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     })
                     .then(() => {
-                        // FORCE LOGOUT so they can't access system without verifying
+                        // CRITICAL: Force Logout immediately after signup
                         return auth.signOut();
                     })
                     .then(() => {
-                        alert(`Account created! We sent a verification email to ${email}.\nPlease verify before logging in.`);
+                        alert(`Account created successfully!\n\nWe have sent a verification email to ${email}.\n\nPlease verify your email BEFORE logging in.`);
                         window.location.href = 'login.html';
                     })
                     .catch((error) => { alert("Error: " + error.message); });
@@ -235,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LOGIN LOGIC (Strict Verification Check) ---
+    // --- LOGIN LOGIC (Strict Check) ---
     const loginBtn = document.getElementById('btn-login-action');
     if (loginBtn) {
         loginBtn.addEventListener('click', (e) => {
@@ -252,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         } else {
                             // IF NOT VERIFIED: Log them out immediately & Alert
                             auth.signOut().then(() => {
-                                alert("Your email is not verified yet.\nPlease check your inbox and verify to login.");
+                                alert("Login Failed: Your email is not verified yet.\n\nPlease check your inbox/spam folder and click the verification link.");
                             });
                         }
                     })
@@ -268,30 +272,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- AUTH STATE LISTENER (Protect Pages) ---
+    // --- AUTH STATE LISTENER (THE GATEKEEPER) ---
     auth.onAuthStateChanged((user) => {
         const path = window.location.pathname;
+        const page = path.split("/").pop(); // Gets 'index.html', 'login.html', or '' (root)
+        
+        // Define Public Pages (Safe for unverified users)
         const isPublic = path.includes('login') || path.includes('signup') || path.includes('verify');
         
-        if (user) {
-            // If user is technically "logged in" but not verified, force logout if on a private page
-            // (Double safety check)
-            if (!user.emailVerified) {
-                // We allow them to stay on public pages (like login) to see alerts, 
-                // but if they try to be on 'index.html' (dashboard), we kick them.
-                if(!isPublic && (path.includes('index') || path.includes('booking') || path.includes('my-bookings'))) {
-                     auth.signOut().then(() => window.location.href = 'login.html');
-                }
-                return; 
-            }
+        // Define STRICT Private Pages (Dashboard, My Bookings, Root)
+        // If the path contains 'index' OR is empty (root) OR is 'my-bookings'
+        const isDashboardOrPrivate = path.includes('index') || page === "" || path.includes('my-bookings');
 
-            // If Verified User is on Login page, send to Dashboard
-            if (path.includes('login')) window.location.href = 'index.html';
-            
+        if (user) {
+            // User is technically logged in
+            if (!user.emailVerified) {
+                // BUT User is NOT Verified
+                // If they try to access the Dashboard, kick them out
+                if (isDashboardOrPrivate) {
+                    auth.signOut().then(() => {
+                        // Optional: alert only if they aren't already being redirected
+                        // alert("Access Denied: Please verify your email.");
+                        window.location.href = 'login.html';
+                    });
+                }
+            } else {
+                // User IS Verified
+                // If they are on public login/signup pages, send them to dashboard
+                if (isPublic) {
+                    window.location.href = 'index.html';
+                }
+            }
         } else {
-            // No User -> Redirect to login if on private page
-            // (Guests can view 'booking.html' to see price, but not 'my-bookings' or 'index')
-            if (!isPublic && (path.includes('my-bookings'))) {
+            // NO User (Guest)
+            // If they try to access Dashboard/MyBookings, send to login
+            if (isDashboardOrPrivate) {
                 window.location.href = 'login.html';
             }
         }
