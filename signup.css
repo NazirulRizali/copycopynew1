@@ -8,6 +8,15 @@
     font-family: 'Inter', sans-serif;
 }
 
+.logo-text {
+    font-size: 36px;       /* Size of the text */
+    font-weight: bold;     /* Make it thick like the logo */
+    margin-bottom: 20px;   /* Space below the logo */
+    font-family: 'Arial Black', sans-serif; /* Thick font style */
+}
+
+
+
 body {
     background-color: #080808; /* Deep black/gray background */
     min-height: 100vh;
