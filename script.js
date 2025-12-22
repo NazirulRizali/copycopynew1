@@ -508,3 +508,54 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+
+// =========================================================
+    // 6. SUPPORT PAGE LOGIC
+    // =========================================================
+    const supportForm = document.getElementById('support-form');
+    if (supportForm) {
+        // Auto-fill email if logged in
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('sup-email').value = user.email;
+                // We'll need to fetch the name from Firestore if you want to pre-fill name too
+                db.collection("users").doc(user.uid).get().then(doc => {
+                    if (doc.exists) document.getElementById('sup-name').value = doc.data().fullName;
+                });
+            }
+        });
+
+        supportForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('sup-name').value;
+            const email = document.getElementById('sup-email').value;
+            const subject = document.getElementById('sup-subject').value;
+            const message = document.getElementById('sup-message').value;
+            const btn = document.querySelector('.btn-submit');
+
+            btn.textContent = "Sending...";
+            btn.disabled = true;
+
+            // Save to Firestore 'messages' collection
+            db.collection("messages").add({
+                name: name,
+                email: email,
+                subject: subject,
+                message: message,
+                createdAt: new Date()
+            })
+            .then(() => {
+                alert("Message sent successfully! We will contact you shortly.");
+                supportForm.reset();
+                btn.textContent = "Send Message";
+                btn.disabled = false;
+            })
+            .catch((error) => {
+                alert("Error sending message: " + error.message);
+                btn.textContent = "Send Message";
+                btn.disabled = false;
+            });
+        });
+    }
