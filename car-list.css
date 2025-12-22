@@ -37,12 +37,14 @@
     align-items: stretch;
 }
 
-/* Car Card Styling */
+/* Car Card Styling 
+   Padding set to 0 to allow the image to be edge-to-edge 
+*/
 .car-card {
     background-color: var(--card-dark);
     border: 1px solid #2d3748;
     border-radius: 8px;
-    padding: 0; /* Changed to 0 so image hits the edges */
+    padding: 0; 
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -55,13 +57,12 @@
 }
 
 /* LANDSCAPE IMAGE BOX 
-   This is the key fix for the landscape look 
+   Uses aspect-ratio to prevent "zoomed in" or "black bar" looks
 */
 .car-image-box {
     background-color: #1a202c;
     width: 100%;
-    /* Forces a 16:9 landscape shape regardless of screen size */
-    aspect-ratio: 16 / 9; 
+    aspect-ratio: 16 / 9; /* Professional landscape ratio */
     overflow: hidden;
     display: flex;
     justify-content: center;
@@ -69,20 +70,25 @@
     position: relative;
 }
 
-/* IMAGE STYLING 
-   'cover' fills the landscape box perfectly 
-*/
+/* IMAGE STYLING */
 .car-img {
     width: 100%;
     height: 100%;
-    object-fit: cover; 
+    object-fit: cover; /* Fills the 16:9 box perfectly */
     object-position: center;
     display: block;
+    transition: transform 0.4s ease;
 }
 
-/* Car Details Padding (Re-added since card padding is 0) */
+.car-card:hover .car-img {
+    transform: scale(1.05);
+}
+
+/* Car Details Padding 
+   Added here since the main card padding was removed
+*/
 .car-details {
-    padding: 1.2rem;
+    padding: 1.25rem;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -124,19 +130,15 @@
     color: white;
     border: none;
     padding: 0.75rem;
-    border-radius: 5px;
+    border-radius: 4px;
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
+    transition: background 0.2s;
 }
 
 .btn-select:hover {
-    background-color: #d35400;
-}
-
-.btn-select:active {
-    transform: scale(0.98);
+    background-color: #d35400; /* Deep orange hover */
 }
 
 /* Action Area */
@@ -151,7 +153,7 @@
     color: #e2e8f0;
     border: none;
     padding: 0.7rem 1.5rem;
-    border-radius: 5px;
+    border-radius: 4px;
     font-size: 0.9rem;
     cursor: pointer;
     display: flex;
