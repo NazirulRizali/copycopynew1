@@ -131,3 +131,10 @@ body {
 .login-footer a:hover {
     text-decoration: underline;
 }
+
+.logo-text {
+    font-size: 36px;       /* Size of the text */
+    font-weight: bold;     /* Make it thick like the logo */
+    margin-bottom: 20px;   /* Space below the logo */
+    font-family: 'Arial Black', sans-serif; /* Thick font style */
+}
