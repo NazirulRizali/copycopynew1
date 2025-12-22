@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - COMPLETE (Auth, Booking, Support, Location, Validation, PDF Receipt)
+   script.js - COMPLETE (Auth, Booking, Support, Location, Validation, PDF, Profile)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Signup Logic (UPDATED: Saves Phone Number)
+    // Signup Logic (UPDATED: Checks Terms & Conditions)
     const signupBtn = document.getElementById('btn-signup-action');
     if (signupBtn) {
         signupBtn.addEventListener('click', (e) => {
@@ -186,7 +186,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const countryCode = document.getElementById('signup-country-code').value;
             const phoneNum = document.getElementById('signup-phone').value;
 
-            if (email && pass && name && phoneNum) {
+            // NEW: Get Terms Checkbox Status
+            const terms = document.getElementById('signup-terms').checked;
+
+            // 1. Check if Terms are ticked
+            if (!terms) {
+                alert("You must agree to the Terms and Conditions to register.");
+                return; // Stop here!
+            }
+
+            // 2. Check if other fields are filled
+            if (email && pass && name && phoneNum && age && country) {
                 auth.createUserWithEmailAndPassword(email, pass)
                     .then((userCredential) => {
                         const user = userCredential.user;
@@ -208,7 +218,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.location.href = 'login.html';
                     })
                     .catch((error) => alert(error.message));
-            } else { alert("Please fill in all fields."); }
+            } else { 
+                alert("Please fill in all fields."); 
+            }
         });
     }
 
@@ -248,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const path = window.location.pathname;
         const page = path.split("/").pop();
         const isPublic = path.includes('login') || path.includes('signup') || path.includes('verify');
-        const isPrivate = path.includes('index') || path.includes('my-bookings');
+        const isPrivate = path.includes('index') || path.includes('my-bookings') || path.includes('profile');
 
         if (user) {
             if (!user.emailVerified && isPrivate) {
@@ -547,7 +559,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-   // ---------------------------------------------------------
+    // ---------------------------------------------------------
     // 7. PROFILE PAGE LOGIC (NEW)
     // ---------------------------------------------------------
     const profileForm = document.getElementById('profile-form');
@@ -616,5 +628,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
+
 // CLOSING BRACKET FOR DOMContentLoaded
 });
