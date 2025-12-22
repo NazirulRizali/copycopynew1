@@ -63,7 +63,7 @@
     font-size: 0.8rem;
 }
 
-/* Message Form */
+/* Message Form Layout */
 .message-section {
     display: flex;
     justify-content: center;
@@ -117,29 +117,36 @@
     }
 }
 
+/* =========================================
+   Unified Dark Input Styles (NEW CODE)
+   ========================================= */
 
-/* Fix for Message Box Styling */
-textarea.dark-input {
-    background-color: #262f40 !important; /* Matches your other inputs */
-    border: 1px solid #4b5563;
-    color: #e2e8f0;
-    padding: 1rem;
-    border-radius: 4px;
-    font-size: 0.9rem;
+/* 1. Base Style for ALL Dark Inputs (Name, Email, Select, Message) */
+.dark-input {
+    background-color: #1f2937 !important; /* Dark Grey background */
+    border: 1px solid #374151;           /* Subtle border */
+    color: white;                        /* White text */
+    padding: 1rem;                       /* Comfortable spacing */
+    border-radius: 8px;                  /* Rounded corners */
+    width: 100%;                         /* Full width */
+    font-family: 'Inter', sans-serif;    
+    font-size: 0.95rem;
     outline: none;
-    width: 100%;
-    resize: vertical; /* Allows user to resize if they want */
-    
-    /* "Add little high" - Making it taller */
-    min-height: 150px; 
-    font-family: 'Inter', sans-serif; /* Ensures font matches the rest */
+    transition: border-color 0.2s;
 }
 
-textarea.dark-input:focus {
-    border-color: #c84e08; /* Orange border when clicking */
+/* 2. Specific Style just for the MESSAGE Box (Textarea) */
+textarea.dark-input {
+    resize: vertical;      /* Allow resizing */
+    min-height: 150px;     /* Make it tall */
 }
 
-/* Ensure placeholders are visible */
-textarea.dark-input::placeholder {
+/* 3. Highlight border when clicking any box */
+.dark-input:focus {
+    border-color: #c84e08; /* Orange border on focus */
+}
+
+/* 4. Style the placeholder text (e.g., "Enter your name") */
+.dark-input::placeholder {
     color: #9ca3af;
 }
