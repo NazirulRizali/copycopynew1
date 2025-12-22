@@ -503,132 +503,109 @@ select.dark-input option, select#pickup-location option {
 }
 
 /* =========================================
-   9. FLATPICKR (CALENDAR) DARK THEME
+   9. FLATPICKR (CALENDAR) - TARGET DARK THEME
    ========================================= */
 
-/* Main Calendar Container */
+/* 1. Main Container & Background */
 .flatpickr-calendar {
-    background: #1f2937 !important; /* Dark background */
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    background: #1f2937 !important; /* Dark Grey Background */
     border: 1px solid #374151 !important;
-    color: #e5e7eb !important; /* Light text color */
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    color: white !important;
     font-family: 'Inter', sans-serif !important;
-    width: 320px !important; /* Standard width */
+    width: 310px !important; /* Fixed width prevents squishing */
 }
 
-/* Month & Year Header */
+/* 2. Header (Month & Year) */
 .flatpickr-month {
-    color: #e5e7eb !important;
-    fill: #e5e7eb !important;
+    background: #1f2937 !important;
+    color: white !important;
+    height: 50px !important;
+    border-bottom: none !important;
 }
+
 .flatpickr-current-month .flatpickr-monthDropdown-months,
 .flatpickr-current-month input.cur-year {
-    color: #e5e7eb !important;
-    font-weight: 600;
-}
-.flatpickr-prev-month:hover svg,
-.flatpickr-next-month:hover svg {
-    fill: #c84e08 !important; /* Orange arrows on hover */
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
 }
 
-/* Day Names */
+.flatpickr-current-month .flatpickr-monthDropdown-months:hover,
+.flatpickr-current-month input.cur-year:hover {
+    background: transparent !important;
+}
+
+/* 3. Arrows (Left/Right) */
+.flatpickr-prev-month, .flatpickr-next-month {
+    fill: white !important; /* Make arrows white */
+    color: white !important;
+    top: 15px !important;
+}
+.flatpickr-prev-month:hover svg, .flatpickr-next-month:hover svg {
+    fill: #c84e08 !important; /* Orange on hover */
+}
+
+/* 4. Weekdays (Sun, Mon...) */
+.flatpickr-weekdays {
+    background: #1f2937 !important;
+}
 span.flatpickr-weekday {
-    color: #9ca3af !important;
+    color: #9ca3af !important; /* Light Gray */
+    font-weight: 600 !important;
+}
+
+/* 5. Days (The Numbers) */
+.flatpickr-day {
+    color: #e2e8f0 !important;
     font-weight: 500;
 }
 
-/* The Days */
-.flatpickr-day {
-    color: #e5e7eb !important;
-    border-radius: 50%;
-}
-.flatpickr-day.prevMonthDay, 
-.flatpickr-day.nextMonthDay {
-    color: #4b5563 !important;
+/* Hover Effect */
+.flatpickr-day:hover {
+    background: #374151 !important;
+    border-color: #374151 !important;
 }
 
-/* Selected Date */
+/* 6. Selected Date (The Orange Circle) */
 .flatpickr-day.selected, 
 .flatpickr-day.startRange, 
 .flatpickr-day.endRange, 
 .flatpickr-day.selected.inRange, 
-.flatpickr-day.startRange.inRange, 
-.flatpickr-day.endRange.inRange,
-.flatpickr-day.selected:focus,
+.flatpickr-day.selected:focus, 
 .flatpickr-day.selected:hover {
-    background: #c84e08 !important;
-    border-color: #c84e08 !important;
-    color: #ffffff !important;
-    font-weight: 700;
+    background: #3b82f6 !important; /* Use Blue like your target image (or use #c84e08 for Orange) */
+    border-color: #3b82f6 !important;
+    color: white !important;
+    font-weight: bold;
 }
 
-/* The Time Picker Section */
+/* 7. Time Picker (Fixed to Bottom) */
 .flatpickr-time {
     border-top: 1px solid #374151 !important;
-    padding: 1rem !important;
+    padding: 10px !important;
     display: flex !important;
     align-items: center !important;
-    justify-content: space-between !important;
-    height: auto !important;
-    border-left: none !important;
-    width: 100% !important;
+    justify-content: center !important;
+    background: #1f2937 !important;
 }
 
-/* "Time" Label */
-.flatpickr-time::before {
-    content: 'Time';
-    color: #e5e7eb;
-    font-weight: 600;
-    font-size: 1rem;
-    margin-right: auto;
-}
-
-/* Time Input Boxes */
 .flatpickr-time .numInputWrapper {
-    background: #374151 !important;
-    border-radius: 8px;
-    padding: 5px;
-    height: auto !important;
     color: white !important;
-    width: auto !important;
 }
-.flatpickr-time input.numInput {
+
+.flatpickr-time input.flatpickr-hour, 
+.flatpickr-time input.flatpickr-minute {
     color: white !important;
-    font-weight: 600;
-    font-size: 1rem;
+    font-weight: bold !important;
 }
+
 .flatpickr-time .flatpickr-am-pm {
     color: white !important;
-    font-weight: 600;
-    margin-left: 5px;
-    background: #374151;
-    border-radius: 8px;
-    padding: 5px 10px;
-    height: auto !important;
+    cursor: pointer;
 }
 
-/* Footer Buttons */
-.flatpickr-footer {
-    background: #1f2937;
-    border-top: none;
-    padding: 0 1rem 1rem 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0 !important;
-}
-.flatpickr-btn {
-    padding: 0.6rem 1.2rem;
-    border-radius: 30px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-}
-.flatpickr-btn:first-child {
-    background: #374151;
-    color: #e5e7eb;
-}
-.flatpickr-btn:last-child {
-    background: #3b82f6;
-    color: white;
+/* 8. Reset Layout Conflicts */
+.flatpickr-innerContainer {
+    display: block !important; /* Stop the side-by-side layout */
 }
