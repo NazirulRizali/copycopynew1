@@ -11,35 +11,45 @@
 body {
     background-color: #080808; 
     height: 100vh;
+    width: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* Prevents scrollbars from the video */
+    overflow: hidden; /* Important: Prevents video from causing scrollbars */
 }
 
-/* Background Video Styling */
+/* =========================================
+   VIDEO BACKGROUND: FIXED POSITION
+   ========================================= */
 .bg-video {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    position: fixed;   /* Pulls video out of the layout flow */
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: -1;       /* Places video behind everything */
+    transform: translate(-50%, -50%); /* Centers the video perfectly */
     object-fit: cover;
-    z-index: -1;
-    filter: brightness(40%); /* Dims the video for better readability */
+    filter: brightness(40%); /* Darkens video so text is readable */
 }
 
+/* =========================================
+   CONTENT WRAPPER
+   ========================================= */
 .login-wrapper {
+    position: relative;
+    z-index: 1;        /* Forces form to stay above the video */
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1; /* Ensures content is above video */
 }
 
 .login-card {
     background-color: rgba(26, 26, 26, 0.85); /* Semi-transparent */
-    backdrop-filter: blur(10px); /* Glassmorphism effect */
+    backdrop-filter: blur(10px); /* Modern frosted-glass effect */
     padding: 3rem 2.5rem;
     border-radius: 16px;
     width: 100%;
@@ -65,17 +75,18 @@ body {
 .input-group input {
     width: 100%;
     background-color: rgba(43, 43, 43, 0.9);
-    border: none;
+    border: 1px solid transparent;
     padding: 0.9rem 1rem;
     border-radius: 8px;
     color: #e0e0e0;
     font-size: 0.95rem;
     outline: none;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
 }
 
 .input-group input:focus {
     background-color: #383838;
+    border-color: #2b2bff;
 }
 
 .input-group input::placeholder {
