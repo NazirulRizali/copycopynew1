@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return new Date(year, month - 1, day, hours, minutes);
     }
 
+    // PDF GENERATOR
     function generateDetailedPDF(booking, diffDays, rentalFee, insurance, taxes, phone, method) {
         const { jsPDF } = window.jspdf;
         if (!jsPDF) {
@@ -120,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
             L.marker([ap.lat, ap.lng], { icon: carIcon }).addTo(map).bindPopup(`<b>${ap.name}</b><br>Available`);
         });
 
-        // --- USER LOCATION LOGIC ---
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(pos => {
                 const userIcon = L.icon({
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Signup
+    // Signup Logic (UPDATED: Saves Phone Number)
     const signupBtn = document.getElementById('btn-signup-action');
     if (signupBtn) {
         signupBtn.addEventListener('click', (e) => {
@@ -181,14 +181,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const name = document.getElementById('signup-name').value;
             const age = document.getElementById('signup-age').value;
             const country = document.getElementById('signup-country').value;
+            
+            // Get Phone Info
+            const countryCode = document.getElementById('signup-country-code').value;
+            const phoneNum = document.getElementById('signup-phone').value;
 
-            if (email && pass && name) {
+            if (email && pass && name && phoneNum) {
                 auth.createUserWithEmailAndPassword(email, pass)
                     .then((userCredential) => {
                         const user = userCredential.user;
                         user.sendEmailVerification();
+                        
+                        // Save extra fields including PHONE to Firestore
                         return db.collection("users").doc(user.uid).set({
-                            fullName: name, email: email, age: age, country: country, createdAt: new Date()
+                            fullName: name, 
+                            email: email, 
+                            age: age, 
+                            country: country, 
+                            phone: `${countryCode} ${phoneNum}`, // Saves formatted phone
+                            createdAt: new Date()
                         });
                     })
                     .then(() => auth.signOut())
@@ -237,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const path = window.location.pathname;
         const page = path.split("/").pop();
         const isPublic = path.includes('login') || path.includes('signup') || path.includes('verify');
-        const isPrivate = path.includes('index') || page === "" || path.includes('my-bookings');
+        const isPrivate = path.includes('index') || path.includes('my-bookings');
 
         if (user) {
             if (!user.emailVerified && isPrivate) {
@@ -258,15 +269,19 @@ document.addEventListener('DOMContentLoaded', () => {
         searchBtn.addEventListener('click', (e) => {
             e.preventDefault();
 
+            // 1. Get Values
             const locationVal = document.getElementById('pickup-location').value;
             const pickupVal = document.getElementById('pickup-date').value;
             const dropoffVal = document.getElementById('dropoff-date').value;
 
+            // 2. CHECK: RESTRICTION
+            // If any value is missing, Alert and Stop.
             if (!locationVal || !pickupVal || !dropoffVal) {
                 alert("Please select a Pick-up Location, Pick-up Date, and Drop-off Date to continue.");
-                return; 
+                return; // Stop execution here
             }
 
+            // 3. Save & Redirect (Only happens if check passes)
             sessionStorage.setItem('rentalLocation', locationVal);
             sessionStorage.setItem('pickupDate', pickupVal);
             sessionStorage.setItem('dropoffDate', dropoffVal);
@@ -338,23 +353,43 @@ document.addEventListener('DOMContentLoaded', () => {
         if (finalPayBtn) {
             finalPayBtn.addEventListener('click', () => {
                 const user = auth.currentUser;
-                const phoneInput = document.querySelector('.payment-form-box input[placeholder="123 456 7890"]');
                 finalPayBtn.textContent = "Processing..."; finalPayBtn.disabled = true;
 
-                const newBooking = {
-                    carName, location, dateRange: `${formatD(date1)} to ${formatD(date2)}`,
-                    totalPrice: total.toFixed(2), phone: phoneInput ? phoneInput.value : "",
-                    status: "Active", paymentMethod: selectedMethod, createdAt: new Date()
-                };
+                // 1. Fetch User Profile to get the Phone Number (Since we deleted inputs)
+                db.collection("users").doc(user.uid).get().then((doc) => {
+                    let userPhone = "N/A";
+                    if (doc.exists) {
+                        userPhone = doc.data().phone || "N/A";
+                    }
 
-                db.collection("users").doc(user.uid).collection("bookings").add(newBooking)
-                .then((docRef) => {
-                    newBooking.id = docRef.id.substring(0, 8).toUpperCase();
-                    generateDetailedPDF(newBooking, diffDays, rentalFee, insurance, taxes, newBooking.phone, selectedMethod);
-                    modal.style.display = 'none';
-                    setTimeout(() => { window.location.href = 'my-bookings.html'; }, 1000);
+                    const newBooking = {
+                        carName, 
+                        location, 
+                        dateRange: `${formatD(date1)} to ${formatD(date2)}`,
+                        totalPrice: total.toFixed(2), 
+                        phone: userPhone, // Uses stored phone
+                        status: "Active", 
+                        paymentMethod: selectedMethod, 
+                        createdAt: new Date()
+                    };
+
+                    // 2. Save Booking
+                    return db.collection("users").doc(user.uid).collection("bookings").add(newBooking)
+                        .then((docRef) => {
+                            newBooking.id = docRef.id.substring(0, 8).toUpperCase();
+                            
+                            // 3. Generate PDF Download
+                            generateDetailedPDF(newBooking, diffDays, rentalFee, insurance, taxes, newBooking.phone, selectedMethod);
+                            
+                            modal.style.display = 'none';
+                            setTimeout(() => { window.location.href = 'my-bookings.html'; }, 2000);
+                        });
                 })
-                .catch((err) => { alert("Error: " + err.message); finalPayBtn.disabled = false; });
+                .catch((err) => { 
+                    alert("Error: " + err.message); 
+                    finalPayBtn.disabled = false; 
+                    finalPayBtn.textContent = "Pay Now";
+                });
             });
         }
     }
@@ -430,7 +465,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const booking = bookings[index];
 
                     // 1. Recalculate Days
-                    // Assuming dateRange format is "YYYY-MM-DD to YYYY-MM-DD" from formatD function
                     const dates = booking.dateRange.split(' to ');
                     const d1 = new Date(dates[0]);
                     const d2 = new Date(dates[1]);
