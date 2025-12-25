@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - COMPLETE (Auth, Booking, Support, Location, Validation, PDF, Profile, Vendor)
+   script.js - COMPLETE (Auth, Booking, Support, Location, PDF, Profile, Vendor Orders)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -40,19 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // PDF GENERATOR
     function generateDetailedPDF(booking, diffDays, rentalFee, insurance, taxes, phone, method) {
         const { jsPDF } = window.jspdf;
-        if (!jsPDF) {
-            alert("PDF Library not loaded. Please refresh the page.");
-            return;
-        }
+        if (!jsPDF) { alert("PDF Library not loaded. Please refresh."); return; }
         const doc = new jsPDF();
 
-        // Header
         doc.setFillColor(200, 78, 8); doc.rect(0, 0, 210, 40, 'F'); 
         doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.setFont("helvetica", "bold");
         doc.text("SafeRent Car", 20, 25);
         doc.setFontSize(12); doc.text("Booking Confirmation", 190, 25, { align: "right" });
 
-        // Details
         doc.setTextColor(0, 0, 0); doc.setFontSize(14); doc.text("Rental Details", 20, 60);
         doc.setFontSize(10);
         doc.text("Car Model:", 20, 70); doc.text(booking.carName, 90, 70);
@@ -63,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         doc.line(20, 120, 190, 120);
         
-        // Summary
         doc.setFontSize(14); doc.text("Payment Summary", 20, 140);
         doc.setFontSize(10);
         doc.text(`Rental Fee (${diffDays} days):`, 20, 150); doc.text(`RM${rentalFee.toFixed(2)}`, 190, 150, { align: "right" });
@@ -110,17 +104,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mapElement) {
         const map = L.map('dashboard-map').setView([4.2105, 101.9758], 6);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO' }).addTo(map);
-
         const carIcon = L.icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
             shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
             iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
         });
-
         airports.forEach(ap => {
             L.marker([ap.lat, ap.lng], { icon: carIcon }).addTo(map).bindPopup(`<b>${ap.name}</b><br>Available`);
         });
-
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(pos => {
                 const userIcon = L.icon({
@@ -133,19 +124,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ---------------------------------------------------------
-    // 2. CALENDAR
-    // ---------------------------------------------------------
     if (document.getElementById("pickup-date")) {
         flatpickr("#pickup-date", { enableTime: true, dateFormat: "d/m/Y h:i K", defaultHour: 10 });
         flatpickr("#dropoff-date", { enableTime: true, dateFormat: "d/m/Y h:i K", defaultHour: 10 });
     }
 
     // ---------------------------------------------------------
-    // 3. AUTH LOGIC (Signup, Login, Reset, Protect)
+    // 3. AUTH LOGIC
     // ---------------------------------------------------------
-    
-    // Reset Password
     const forgotLink = document.getElementById('link-forgot-pass');
     const resetModal = document.getElementById('reset-modal');
     const closeResetBtn = document.getElementById('close-reset-modal');
@@ -171,9 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ============================================
-    // UPDATED SIGNUP LOGIC (Saves Role)
-    // ============================================
+    // SIGNUP
     const signupBtn = document.getElementById('btn-signup-action');
     if (signupBtn) {
         signupBtn.addEventListener('click', (e) => {
@@ -186,90 +170,52 @@ document.addEventListener('DOMContentLoaded', () => {
             const countryCode = document.getElementById('signup-country-code').value;
             const phoneNum = document.getElementById('signup-phone').value;
             const terms = document.getElementById('signup-terms').checked;
-            
-            // Get Role from Dropdown
             const role = document.getElementById('signup-role').value;
 
-            if (!terms) {
-                alert("You must agree to the Terms and Conditions.");
-                return;
-            }
-
+            if (!terms) { alert("You must agree to the Terms and Conditions."); return; }
             if (email && pass && name && phoneNum && age && country) {
                 auth.createUserWithEmailAndPassword(email, pass)
                     .then((userCredential) => {
                         const user = userCredential.user;
                         user.sendEmailVerification();
-                        
-                        // SAVE ROLE TO DATABASE
                         return db.collection("users").doc(user.uid).set({
-                            fullName: name, 
-                            email: email, 
-                            age: age, 
-                            country: country, 
-                            phone: `${countryCode} ${phoneNum}`,
-                            role: role, // Saves "customer" or "vendor"
-                            createdAt: new Date()
+                            fullName: name, email: email, age: age, country: country, 
+                            phone: `${countryCode} ${phoneNum}`, role: role, createdAt: new Date()
                         });
                     })
                     .then(() => auth.signOut())
-                    .then(() => {
-                        alert("Account created! Please verify your email before logging in.");
-                        window.location.href = 'login.html';
-                    })
+                    .then(() => { alert("Account created! Verify email."); window.location.href = 'login.html'; })
                     .catch((error) => alert(error.message));
-            } else { 
-                alert("Please fill in all fields."); 
-            }
+            } else { alert("Please fill in all fields."); }
         });
     }
 
-    // ============================================
-    // UPDATED LOGIN LOGIC (Checks Role)
-    // ============================================
+    // LOGIN
     const loginBtn = document.getElementById('btn-login-action');
     if (loginBtn) {
         loginBtn.addEventListener('click', (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-pass').value;
-            
-            // The role the user claims to be right now
             const selectedRole = document.getElementById('login-role').value; 
 
             if (email && pass) {
                 auth.signInWithEmailAndPassword(email, pass)
                     .then((userCredential) => {
                         const user = userCredential.user;
-
-                        if (!user.emailVerified) {
-                            auth.signOut();
-                            alert("Email not verified. Please check your inbox.");
-                            return;
-                        }
-
-                        // CHECK DATABASE FOR REAL ROLE
+                        if (!user.emailVerified) { auth.signOut(); alert("Email not verified."); return; }
+                        
                         db.collection("users").doc(user.uid).get().then((doc) => {
                             if (doc.exists) {
-                                const registeredRole = doc.data().role || 'customer'; // Default to customer if missing
-
+                                const registeredRole = doc.data().role || 'customer';
                                 if (registeredRole === selectedRole) {
-                                    // MATCH: Access Granted
-                                    if (registeredRole === 'vendor') {
-                                        window.location.href = 'vendor.html';
-                                    } else {
-                                        window.location.href = 'index.html';
-                                    }
+                                    if (registeredRole === 'vendor') window.location.href = 'vendor.html';
+                                    else window.location.href = 'index.html';
                                 } else {
-                                    // MISMATCH: Access Denied
                                     auth.signOut();
-                                    alert(`Login Failed: You are registered as a '${registeredRole.toUpperCase()}', but you tried to login as a '${selectedRole.toUpperCase()}'. Please change your selection.`);
+                                    alert(`Login Failed: You are a '${registeredRole.toUpperCase()}', not a '${selectedRole.toUpperCase()}'.`);
                                 }
-                            } else {
-                                // Fallback if user doc deleted
-                                auth.signOut();
-                                alert("User record not found.");
-                            }
+                            } else { auth.signOut(); alert("User record not found."); }
                         });
                     })
                     .catch((error) => alert("Login Failed: " + error.message));
@@ -277,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Logout
+    // LOGOUT
     document.querySelectorAll('.btn-logout').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -285,55 +231,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ============================================
-    // UPDATED PAGE PROTECTION (Role-Based - FIX FLICKER)
-    // ============================================
+    // PAGE PROTECTION
     auth.onAuthStateChanged((user) => {
         const path = window.location.pathname;
-        const page = path.split("/").pop();
-        
         const publicPages = ['login.html', 'signup.html', 'verify.html'];
         const customerPages = ['index.html', 'my-bookings.html', 'profile.html', 'car-list.html', 'booking.html', 'support.html'];
         const vendorPages = ['vendor.html'];
 
         if (user) {
-            // 1. Enforce Email Verification
             if (!user.emailVerified && !publicPages.some(p => path.includes(p))) {
                 auth.signOut().then(() => window.location.href = 'login.html');
                 return;
             }
-
-            // 2. CHECK ROLE & REDIRECT CORRECTLY
             db.collection("users").doc(user.uid).get().then((doc) => {
                 if (doc.exists) {
                     const role = doc.data().role || 'customer';
-
-                    // SITUATION A: Vendor on Customer Page -> Send to Vendor Dash
-                    if (role === 'vendor' && customerPages.some(p => path.includes(p))) {
-                        window.location.href = 'vendor.html';
-                        return;
-                    }
-
-                    // SITUATION B: Customer on Vendor Page -> Send to Home
-                    if (role === 'customer' && vendorPages.some(p => path.includes(p))) {
-                        window.location.href = 'index.html';
-                        return;
-                    }
-
-                    // SITUATION C: User is on Login/Signup (Public) -> Send to their correct dashboard
-                    // This fixes the flicker by checking role BEFORE redirecting
+                    if (role === 'vendor' && customerPages.some(p => path.includes(p))) { window.location.href = 'vendor.html'; return; }
+                    if (role === 'customer' && vendorPages.some(p => path.includes(p))) { window.location.href = 'index.html'; return; }
                     if (publicPages.some(p => path.includes(p)) && !path.includes('verify.html')) {
-                        if (role === 'vendor') {
-                            window.location.href = 'vendor.html';
-                        } else {
-                            window.location.href = 'index.html';
-                        }
+                        if (role === 'vendor') window.location.href = 'vendor.html';
+                        else window.location.href = 'index.html';
+                    }
+                    
+                    // NEW: LOAD VENDOR ORDERS
+                    if (role === 'vendor' && path.includes('vendor.html')) {
+                        loadVendorOrders(user.uid);
                     }
                 }
             });
-
         } else {
-            // User is NOT logged in -> Kick them out of private pages
             if (customerPages.some(p => path.includes(p)) || vendorPages.some(p => path.includes(p))) {
                 window.location.href = 'login.html';
             }
@@ -341,26 +267,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ---------------------------------------------------------
-    // 4. BOOKING & PAYMENT LOGIC (UPDATED WITH RESTRICTION)
+    // 4. BOOKING LOGIC
     // ---------------------------------------------------------
     const searchBtn = document.getElementById('search-btn');
     if (searchBtn) {
         searchBtn.addEventListener('click', (e) => {
             e.preventDefault();
-
-            // 1. Get Values
             const locationVal = document.getElementById('pickup-location').value;
             const pickupVal = document.getElementById('pickup-date').value;
             const dropoffVal = document.getElementById('dropoff-date').value;
-
-            // 2. CHECK: RESTRICTION
-            // If any value is missing, Alert and Stop.
-            if (!locationVal || !pickupVal || !dropoffVal) {
-                alert("Please select a Pick-up Location, Pick-up Date, and Drop-off Date to continue.");
-                return; // Stop execution here
-            }
-
-            // 3. Save & Redirect (Only happens if check passes)
+            if (!locationVal || !pickupVal || !dropoffVal) { alert("Please complete all fields."); return; }
             sessionStorage.setItem('rentalLocation', locationVal);
             sessionStorage.setItem('pickupDate', pickupVal);
             sessionStorage.setItem('dropoffDate', dropoffVal);
@@ -376,10 +292,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Booking Summary & Payment
     const bookingSummary = document.querySelector('.booking-card');
     if (bookingSummary) {
-        const location = sessionStorage.getItem('rentalLocation') || "Kuala Lumpur Intl Airport (KUL)";
+        const location = sessionStorage.getItem('rentalLocation') || "KLIA (KUL)";
         const pickupStr = sessionStorage.getItem('pickupDate') || "05/12/2025 10:00 AM";
         const dropoffStr = sessionStorage.getItem('dropoffDate') || "10/12/2025 11:00 AM";
         const carName = sessionStorage.getItem('selectedCarName') || "Toyota Vios";
@@ -411,9 +326,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let selectedMethod = null;
 
         payBtn.addEventListener('click', () => {
-             const user = auth.currentUser;
-             if (!user) { alert("Please login first."); window.location.href = 'login.html'; return; }
-             if (!user.emailVerified) { alert("Verify email first."); return; }
+             if (!auth.currentUser) { alert("Please login."); return; }
+             if (!auth.currentUser.emailVerified) { alert("Verify email."); return; }
              modal.style.display = 'flex';
         });
 
@@ -434,280 +348,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 const user = auth.currentUser;
                 finalPayBtn.textContent = "Processing..."; finalPayBtn.disabled = true;
 
-                // 1. Fetch User Profile to get the Phone Number (Since we deleted inputs)
+                // 1. Fetch User Data (Phone + Full Name)
                 db.collection("users").doc(user.uid).get().then((doc) => {
                     let userPhone = "N/A";
+                    let userName = "Valued Customer";
                     if (doc.exists) {
                         userPhone = doc.data().phone || "N/A";
+                        userName = doc.data().fullName || "Valued Customer";
                     }
 
                     const newBooking = {
-                        carName, 
-                        location, 
+                        carName, location, 
                         dateRange: `${formatD(date1)} to ${formatD(date2)}`,
                         totalPrice: total.toFixed(2), 
-                        phone: userPhone, // Uses stored phone
+                        phone: userPhone, 
+                        customerName: userName, // <--- ADDED CUSTOMER NAME
                         status: "Active", 
                         paymentMethod: selectedMethod, 
                         createdAt: new Date()
                     };
 
-                    // 2. Save Booking
                     return db.collection("users").doc(user.uid).collection("bookings").add(newBooking)
                         .then((docRef) => {
                             newBooking.id = docRef.id.substring(0, 8).toUpperCase();
-                            
-                            // 3. Generate PDF Download
                             generateDetailedPDF(newBooking, diffDays, rentalFee, insurance, taxes, newBooking.phone, selectedMethod);
-                            
                             modal.style.display = 'none';
                             setTimeout(() => { window.location.href = 'my-bookings.html'; }, 2000);
                         });
                 })
-                .catch((err) => { 
-                    alert("Error: " + err.message); 
-                    finalPayBtn.disabled = false; 
-                    finalPayBtn.textContent = "Pay Now";
-                });
+                .catch((err) => { alert("Error: " + err.message); finalPayBtn.disabled = false; });
             });
         }
     }
 
     // ---------------------------------------------------------
-    // 5. MY BOOKINGS (UPDATED WITH PDF GENERATOR)
+    // 5. VENDOR LOGIC
     // ---------------------------------------------------------
-    const bookingsListContainer = document.getElementById('bookings-list');
-    if (bookingsListContainer) {
-        auth.onAuthStateChanged((user) => {
-            if (user && user.emailVerified) {
-                bookingsListContainer.innerHTML = '<p style="color:white;">Loading...</p>';
-                db.collection("users").doc(user.uid).collection("bookings").orderBy("createdAt", "desc").get()
-                .then((snap) => {
-                    const bookings = [];
-                    snap.forEach(doc => {
-                        const d = doc.data(); 
-                        d.id = doc.id.substring(0, 8).toUpperCase(); 
-                        d.realDocId = doc.id; 
-                        bookings.push(d);
-                    });
-                    renderBookings(bookings);
-                });
-            } else { bookingsListContainer.innerHTML = '<p style="color:white;">Please log in.</p>'; }
-        });
-
-        function renderBookings(bookings) {
-            document.getElementById('bookings-title').textContent = `MY BOOKINGS (${bookings.length} Total)`;
-            bookingsListContainer.innerHTML = ''; 
-            
-            if(bookings.length === 0) { 
-                bookingsListContainer.innerHTML = '<p style="color:gray;">No bookings found.</p>'; 
-                return; 
-            }
-
-            // Loop through bookings with index
-            bookings.forEach((booking, index) => {
-                const badgeClass = booking.status === "Active" ? "active" : "completed";
-                const btnHtml = booking.status === "Active" 
-                    ? `<button class="btn-cancel" data-doc-id="${booking.realDocId}">Cancel</button>` 
-                    : `<button class="btn-receipt">Download Receipt</button>`;
-                
-                // Added data-index to View Details button
-                bookingsListContainer.innerHTML += `
-                    <div class="booking-card">
-                        <div class="card-top">
-                            <h3>${booking.status === "Active" ? "Upcoming" : "Past"} Rental</h3>
-                            <span class="status-badge ${badgeClass}">${booking.status}</span>
-                        </div>
-                        <div class="card-body">
-                            <div class="car-info">
-                                <h4>${booking.carName}</h4>
-                                <p class="detail-text">ID: ${booking.id}</p>
-                                <p class="detail-text">Dates: ${booking.dateRange}</p>
-                                <p class="detail-text">Location: ${booking.location}</p>
-                            </div>
-                            <div class="price-info">
-                                <p>Total: RM${booking.totalPrice}</p>
-                            </div>
-                        </div>
-                        <div class="card-actions">
-                            <a href="#" class="btn-view-details" data-index="${index}">View Details</a>
-                            ${btnHtml}
-                        </div>
-                    </div>`;
-            });
-
-            // LOGIC FOR VIEW DETAILS PDF
-            document.querySelectorAll('.btn-view-details').forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault(); // Stop page jump
-                    const index = this.getAttribute('data-index');
-                    const booking = bookings[index];
-
-                    // 1. Recalculate Days
-                    const dates = booking.dateRange.split(' to ');
-                    const d1 = new Date(dates[0]);
-                    const d2 = new Date(dates[1]);
-                    const diffTime = Math.abs(d2 - d1);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
-
-                    // 2. Recalculate Costs
-                    const insurance = 25.00;
-                    const taxes = 15.50;
-                    const total = parseFloat(booking.totalPrice);
-                    const rentalFee = total - insurance - taxes;
-
-                    // 3. Generate PDF
-                    generateDetailedPDF(booking, diffDays, rentalFee, insurance, taxes, booking.phone, booking.paymentMethod);
-                });
-            });
-            
-            // CANCEL LOGIC
-            document.querySelectorAll('.btn-cancel').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    if(confirm("Cancel this booking?")) {
-                        db.collection("users").doc(auth.currentUser.uid)
-                          .collection("bookings").doc(this.getAttribute('data-doc-id'))
-                          .delete().then(() => location.reload());
-                    }
-                });
-            });
-            
-            // DOWNLOAD RECEIPT LOGIC (Optional reuse)
-            document.querySelectorAll('.btn-receipt').forEach(btn => btn.addEventListener('click', () => alert("Click 'View Details' to download receipt.")));
-        }
-    }
-
-    // ---------------------------------------------------------
-    // 6. SUPPORT PAGE LOGIC (CORRECTLY PLACED INSIDE!)
-    // ---------------------------------------------------------
-    const supportForm = document.getElementById('support-form');
-    if (supportForm) {
-        
-        // Auto-fill Logic
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                // Fill Email
-                const emailField = document.getElementById('sup-email');
-                if(emailField) emailField.value = user.email;
-
-                // Fill Name from Firestore
-                db.collection("users").doc(user.uid).get().then((doc) => {
-                    if (doc.exists) {
-                        const nameField = document.getElementById('sup-name');
-                        if (nameField) nameField.value = doc.data().fullName;
-                    }
-                });
-            }
-        });
-
-        // Send Logic
-        supportForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const btn = document.querySelector('.btn-submit');
-            btn.textContent = "Sending..."; btn.disabled = true;
-
-            db.collection("messages").add({
-                name: document.getElementById('sup-name').value,
-                email: document.getElementById('sup-email').value,
-                subject: document.getElementById('sup-subject').value,
-                message: document.getElementById('sup-message').value,
-                createdAt: new Date()
-            })
-            .then(() => {
-                alert("Message sent!");
-                supportForm.reset();
-                if (auth.currentUser) { // Refill email
-                    document.getElementById('sup-email').value = auth.currentUser.email;
-                    db.collection("users").doc(auth.currentUser.uid).get().then(doc => { if(doc.exists) document.getElementById('sup-name').value = doc.data().fullName; });
-                }
-                btn.textContent = "Send Message"; btn.disabled = false;
-            })
-            .catch((err) => { alert(err.message); btn.disabled = false; });
-        });
-    }
-
-    // ---------------------------------------------------------
-    // 7. PROFILE PAGE LOGIC (NEW)
-    // ---------------------------------------------------------
-    const profileForm = document.getElementById('profile-form');
-    if (profileForm) {
-        // A. Load User Data
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                // Fill Email (Auth Data)
-                document.getElementById('pro-email').value = user.email;
-
-                // Fill Other Details (Firestore Data)
-                db.collection("users").doc(user.uid).get().then((doc) => {
-                    if (doc.exists) {
-                        const data = doc.data();
-                        document.getElementById('pro-name').value = data.fullName || "";
-                        document.getElementById('pro-phone').value = data.phone || "";
-                        document.getElementById('pro-age').value = data.age || "";
-                        document.getElementById('pro-country').value = data.country || "MY";
-                    }
-                }).catch(err => console.error("Error fetching profile:", err));
-            } else {
-                // If not logged in, kick them out
-                window.location.href = 'login.html';
-            }
-        });
-
-        // B. Save Changes
-        profileForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const btn = profileForm.querySelector('button[type="submit"]');
-            const originalText = btn.textContent;
-            btn.textContent = "Saving...";
-            btn.disabled = true;
-
-            const user = auth.currentUser;
-            if (user) {
-                db.collection("users").doc(user.uid).update({
-                    fullName: document.getElementById('pro-name').value,
-                    phone: document.getElementById('pro-phone').value,
-                    age: document.getElementById('pro-age').value,
-                    country: document.getElementById('pro-country').value
-                }).then(() => {
-                    alert("Profile updated successfully!");
-                    btn.textContent = originalText;
-                    btn.disabled = false;
-                }).catch((err) => {
-                    alert("Error updating profile: " + err.message);
-                    btn.textContent = originalText;
-                    btn.disabled = false;
-                });
-            }
-        });
-
-        // C. Trigger Password Reset Email
-        const resetPassBtn = document.getElementById('btn-reset-pass-profile');
-        if (resetPassBtn) {
-            resetPassBtn.addEventListener('click', () => {
-                const user = auth.currentUser;
-                if (user && user.email) {
-                    if(confirm("Send a password reset link to " + user.email + "?")) {
-                        auth.sendPasswordResetEmail(user.email)
-                            .then(() => alert("Reset link sent! Check your email."))
-                            .catch(err => alert(err.message));
-                    }
-                }
-            });
-        }
-    }
-
-    // ---------------------------------------------------------
-    // 8. VENDOR & DYNAMIC CAR LIST LOGIC (NEW)
-    // ---------------------------------------------------------
-
-    // A. Handle Vendor Adding a Car
     const vendorForm = document.getElementById('vendor-form');
     if (vendorForm) {
         vendorForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const btn = vendorForm.querySelector('button');
-            btn.textContent = "Publishing...";
-            btn.disabled = true;
+            btn.textContent = "Publishing..."; btn.disabled = true;
 
             const newCar = {
                 name: document.getElementById('v-name').value,
@@ -715,36 +397,81 @@ document.addEventListener('DOMContentLoaded', () => {
                 category: document.getElementById('v-category').value,
                 image: document.getElementById('v-image').value,
                 description: document.getElementById('v-desc').value,
+                vendorId: auth.currentUser.uid, // <--- TAG WITH VENDOR ID
                 createdAt: new Date()
             };
 
             db.collection("cars").add(newCar).then(() => {
                 alert("Car Published Successfully!");
                 vendorForm.reset();
-                btn.textContent = "Publish Car";
-                btn.disabled = false;
-            }).catch((error) => {
-                alert("Error: " + error.message);
-                btn.textContent = "Publish Car";
-                btn.disabled = false;
-            });
+                btn.textContent = "Publish Car"; btn.disabled = false;
+                loadVendorOrders(auth.currentUser.uid); // Refresh list
+            }).catch((error) => { alert("Error: " + error.message); btn.disabled = false; });
         });
     }
 
-    // B. Handle Displaying Cars on car-list.html
+    // NEW FUNCTION: FETCH AND DISPLAY VENDOR ORDERS
+    function loadVendorOrders(vendorUid) {
+        const listDiv = document.getElementById('vendor-orders-list');
+        if (!listDiv) return;
+
+        listDiv.innerHTML = '<p style="text-align:center; color:gray;">Loading...</p>';
+
+        // 1. Get all cars owned by this vendor
+        db.collection("cars").where("vendorId", "==", vendorUid).get().then((carSnaps) => {
+            if (carSnaps.empty) {
+                listDiv.innerHTML = '<p style="text-align:center; color:gray;">You haven\'t listed any cars yet.</p>';
+                return;
+            }
+
+            const myCarNames = [];
+            carSnaps.forEach(doc => myCarNames.push(doc.data().name));
+
+            // 2. Get ALL bookings from ALL users (Collection Group Query)
+            db.collectionGroup('bookings').get().then((bookingSnaps) => {
+                let html = '';
+                let count = 0;
+
+                bookingSnaps.forEach(doc => {
+                    const booking = doc.data();
+                    
+                    // 3. Filter: Is this booking for one of MY cars?
+                    if (myCarNames.includes(booking.carName)) {
+                        count++;
+                        html += `
+                        <div style="background:#222; padding:1rem; border-radius:8px; border:1px solid #444; display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <h4 style="color:#c84e08; margin-bottom:0.2rem;">${booking.carName}</h4>
+                                <p style="color:#ddd; font-size:0.9rem;"><strong>Customer:</strong> ${booking.customerName || 'N/A'}</p>
+                                <p style="color:#ddd; font-size:0.9rem;"><strong>Phone:</strong> ${booking.phone || 'N/A'}</p>
+                                <p style="color:#888; font-size:0.8rem;">${booking.dateRange}</p>
+                            </div>
+                            <div style="text-align:right;">
+                                <p style="color:white; font-weight:bold;">RM${booking.totalPrice}</p>
+                                <span style="background:green; color:white; font-size:0.7rem; padding:2px 8px; border-radius:10px;">${booking.status}</span>
+                            </div>
+                        </div>`;
+                    }
+                });
+
+                if (count === 0) {
+                    listDiv.innerHTML = '<p style="text-align:center; color:gray;">No orders yet.</p>';
+                } else {
+                    listDiv.innerHTML = html;
+                }
+            });
+        }).catch(err => console.error(err));
+    }
+
+    // ---------------------------------------------------------
+    // 6. CAR LIST DISPLAY (Existing Logic)
+    // ---------------------------------------------------------
     const economyGrid = document.getElementById('grid-Economy');
     const suvGrid = document.getElementById('grid-SUV');
     const sportsGrid = document.getElementById('grid-Sports');
 
     if (economyGrid || suvGrid || sportsGrid) {
-        console.log("Loading cars...");
-        
         db.collection("cars").get().then((querySnapshot) => {
-            if (querySnapshot.empty) {
-                // If DB is empty, maybe show default hardcoded ones or a message?
-                console.log("No cars found in database.");
-            }
-
             querySnapshot.forEach((doc) => {
                 const car = doc.data();
                 const carHTML = `
@@ -759,21 +486,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="btn-select" data-name="${car.name}" data-price="${car.price}">Select</button>
                     </div>
                 </div>`;
-
-                // Inject into correct category
-                if (car.category === "Economy" && economyGrid) {
-                    document.getElementById('section-Economy').style.display = 'block';
-                    economyGrid.innerHTML += carHTML;
-                } else if (car.category === "SUV" && suvGrid) {
-                    document.getElementById('section-SUV').style.display = 'block';
-                    suvGrid.innerHTML += carHTML;
-                } else if (car.category === "Sports" && sportsGrid) {
-                    document.getElementById('section-Sports').style.display = 'block';
-                    sportsGrid.innerHTML += carHTML;
-                }
+                if (car.category === "Economy" && economyGrid) { document.getElementById('section-Economy').style.display = 'block'; economyGrid.innerHTML += carHTML; }
+                else if (car.category === "SUV" && suvGrid) { document.getElementById('section-SUV').style.display = 'block'; suvGrid.innerHTML += carHTML; }
+                else if (car.category === "Sports" && sportsGrid) { document.getElementById('section-Sports').style.display = 'block'; sportsGrid.innerHTML += carHTML; }
             });
-
-            // Re-attach Event Listeners for the "Select" buttons (because we just added them dynamically)
             document.querySelectorAll('.btn-select').forEach(button => {
                 button.addEventListener('click', function() {
                     sessionStorage.setItem('selectedCarName', this.getAttribute('data-name'));
@@ -784,5 +500,120 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-// CLOSING BRACKET FOR DOMContentLoaded
+    // ---------------------------------------------------------
+    // 7. OTHER PAGE LOGIC (Support, Profile, My Bookings)
+    // ---------------------------------------------------------
+    // My Bookings
+    const bookingsListContainer = document.getElementById('bookings-list');
+    if (bookingsListContainer) {
+        auth.onAuthStateChanged((user) => {
+            if (user && user.emailVerified) {
+                bookingsListContainer.innerHTML = '<p style="color:white;">Loading...</p>';
+                db.collection("users").doc(user.uid).collection("bookings").orderBy("createdAt", "desc").get()
+                .then((snap) => {
+                    const bookings = [];
+                    snap.forEach(doc => { const d = doc.data(); d.id = doc.id.substring(0, 8).toUpperCase(); d.realDocId = doc.id; bookings.push(d); });
+                    renderBookings(bookings);
+                });
+            } else { bookingsListContainer.innerHTML = '<p style="color:white;">Please log in.</p>'; }
+        });
+        function renderBookings(bookings) {
+            document.getElementById('bookings-title').textContent = `MY BOOKINGS (${bookings.length} Total)`;
+            bookingsListContainer.innerHTML = ''; 
+            if(bookings.length === 0) { bookingsListContainer.innerHTML = '<p style="color:gray;">No bookings found.</p>'; return; }
+            bookings.forEach((booking, index) => {
+                const badgeClass = booking.status === "Active" ? "active" : "completed";
+                const btnHtml = booking.status === "Active" ? `<button class="btn-cancel" data-doc-id="${booking.realDocId}">Cancel</button>` : `<button class="btn-receipt">Download Receipt</button>`;
+                bookingsListContainer.innerHTML += `
+                    <div class="booking-card">
+                        <div class="card-top"><h3>${booking.status === "Active" ? "Upcoming" : "Past"} Rental</h3><span class="status-badge ${badgeClass}">${booking.status}</span></div>
+                        <div class="card-body">
+                            <div class="car-info"><h4>${booking.carName}</h4><p class="detail-text">ID: ${booking.id}</p><p class="detail-text">Dates: ${booking.dateRange}</p><p class="detail-text">Location: ${booking.location}</p></div>
+                            <div class="price-info"><p>Total: RM${booking.totalPrice}</p></div>
+                        </div>
+                        <div class="card-actions"><a href="#" class="btn-view-details" data-index="${index}">View Details</a>${btnHtml}</div>
+                    </div>`;
+            });
+            document.querySelectorAll('.btn-view-details').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const index = this.getAttribute('data-index');
+                    const booking = bookings[index];
+                    const dates = booking.dateRange.split(' to ');
+                    const diffDays = Math.ceil(Math.abs(new Date(dates[1]) - new Date(dates[0])) / (1000 * 60 * 60 * 24)) || 1;
+                    const total = parseFloat(booking.totalPrice);
+                    generateDetailedPDF(booking, diffDays, total - 40.5, 25.00, 15.50, booking.phone, booking.paymentMethod);
+                });
+            });
+            document.querySelectorAll('.btn-cancel').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if(confirm("Cancel?")) { db.collection("users").doc(auth.currentUser.uid).collection("bookings").doc(this.getAttribute('data-doc-id')).delete().then(() => location.reload()); }
+                });
+            });
+        }
+    }
+
+    // Support Form
+    const supportForm = document.getElementById('support-form');
+    if (supportForm) {
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                const emailField = document.getElementById('sup-email'); if(emailField) emailField.value = user.email;
+                db.collection("users").doc(user.uid).get().then((doc) => { if (doc.exists) { const nameField = document.getElementById('sup-name'); if (nameField) nameField.value = doc.data().fullName; } });
+            }
+        });
+        supportForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = document.querySelector('.btn-submit');
+            btn.textContent = "Sending..."; btn.disabled = true;
+            db.collection("messages").add({
+                name: document.getElementById('sup-name').value, email: document.getElementById('sup-email').value,
+                subject: document.getElementById('sup-subject').value, message: document.getElementById('sup-message').value, createdAt: new Date()
+            })
+            .then(() => { alert("Message sent!"); supportForm.reset(); btn.textContent = "Send Message"; btn.disabled = false; })
+            .catch((err) => { alert(err.message); btn.disabled = false; });
+        });
+    }
+
+    // Profile
+    const profileForm = document.getElementById('profile-form');
+    if (profileForm) {
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('pro-email').value = user.email;
+                db.collection("users").doc(user.uid).get().then((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        document.getElementById('pro-name').value = data.fullName || "";
+                        document.getElementById('pro-phone').value = data.phone || "";
+                        document.getElementById('pro-age').value = data.age || "";
+                        document.getElementById('pro-country').value = data.country || "MY";
+                    }
+                });
+            } else { window.location.href = 'login.html'; }
+        });
+        profileForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = profileForm.querySelector('button[type="submit"]');
+            btn.textContent = "Saving..."; btn.disabled = true;
+            const user = auth.currentUser;
+            if (user) {
+                db.collection("users").doc(user.uid).update({
+                    fullName: document.getElementById('pro-name').value,
+                    phone: document.getElementById('pro-phone').value,
+                    age: document.getElementById('pro-age').value,
+                    country: document.getElementById('pro-country').value
+                }).then(() => { alert("Updated!"); btn.textContent = "Save Changes"; btn.disabled = false; })
+                .catch((err) => { alert(err.message); btn.disabled = false; });
+            }
+        });
+        const resetPassBtn = document.getElementById('btn-reset-pass-profile');
+        if (resetPassBtn) {
+            resetPassBtn.addEventListener('click', () => {
+                const user = auth.currentUser;
+                if (user && confirm("Send reset link?")) auth.sendPasswordResetEmail(user.email).then(() => alert("Link sent!"));
+            });
+        }
+    }
+
 });
