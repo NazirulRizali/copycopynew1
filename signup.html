@@ -29,6 +29,20 @@
             </div>
             
             <form id="signup-form">
+                
+                <div class="input-group">
+                    <label>I want to register as a:</label>
+                    <select id="signup-role" class="dark-input" style="cursor: pointer;">
+                        <option value="customer">Customer (Rent a Car)</option>
+                        <option value="vendor">Vendor (List my Car)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="signup-name" class="dark-input" placeholder="e.g., John Doe" required>
+                </div>
+                
                 <div class="input-group">
                     <label>Full Name</label>
                     <input type="text" id="signup-name" class="dark-input" placeholder="e.g., John Doe" required>
