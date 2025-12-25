@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - COMPLETE (Auth, Booking, Support, Location, PDF, Profile, Vendor Orders)
+   script.js - COMPLETE (Auth, Booking, Support, Location, PDF, Profile, Vendor Orders & Tabs)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -384,6 +384,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---------------------------------------------------------
     // 5. VENDOR LOGIC
     // ---------------------------------------------------------
+    
+    // TAB SWITCHING LOGIC (NEW)
+    const tabAddCar = document.getElementById('tab-add-car');
+    const tabOrders = document.getElementById('tab-orders');
+    const viewAddCar = document.getElementById('view-add-car');
+    const viewOrders = document.getElementById('view-orders');
+
+    if (tabAddCar && tabOrders) {
+        tabAddCar.addEventListener('click', () => {
+            tabAddCar.classList.add('active');
+            tabOrders.classList.remove('active');
+            viewAddCar.style.display = 'block';
+            viewOrders.style.display = 'none';
+        });
+
+        tabOrders.addEventListener('click', () => {
+            tabOrders.classList.add('active');
+            tabAddCar.classList.remove('active');
+            viewOrders.style.display = 'block';
+            viewAddCar.style.display = 'none';
+            // Refresh orders when tab clicked
+            if(auth.currentUser) loadVendorOrders(auth.currentUser.uid);
+        });
+    }
+
+    // SUBMIT NEW CAR
     const vendorForm = document.getElementById('vendor-form');
     if (vendorForm) {
         vendorForm.addEventListener('submit', (e) => {
@@ -397,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 category: document.getElementById('v-category').value,
                 image: document.getElementById('v-image').value,
                 description: document.getElementById('v-desc').value,
-                vendorId: auth.currentUser.uid, // TAG WITH VENDOR ID
+                vendorId: auth.currentUser.uid, 
                 createdAt: new Date()
             };
 
@@ -405,19 +431,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Car Published Successfully!");
                 vendorForm.reset();
                 btn.textContent = "Publish Car"; btn.disabled = false;
-                loadVendorOrders(auth.currentUser.uid); // Refresh list
+                loadVendorOrders(auth.currentUser.uid); 
             }).catch((error) => { alert("Error: " + error.message); btn.disabled = false; });
         });
     }
 
-    // NEW FUNCTION: FETCH AND DISPLAY VENDOR ORDERS (UPDATED WITH LOCATION)
+    // FETCH AND DISPLAY VENDOR ORDERS
     function loadVendorOrders(vendorUid) {
         const listDiv = document.getElementById('vendor-orders-list');
         if (!listDiv) return;
 
         listDiv.innerHTML = '<p style="text-align:center; color:gray;">Loading...</p>';
 
-        // 1. Get all cars owned by this vendor
         db.collection("cars").where("vendorId", "==", vendorUid).get().then((carSnaps) => {
             if (carSnaps.empty) {
                 listDiv.innerHTML = '<p style="text-align:center; color:gray;">You haven\'t listed any cars yet.</p>';
@@ -427,15 +452,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const myCarNames = [];
             carSnaps.forEach(doc => myCarNames.push(doc.data().name));
 
-            // 2. Get ALL bookings from ALL users (Collection Group Query)
             db.collectionGroup('bookings').get().then((bookingSnaps) => {
                 let html = '';
                 let count = 0;
 
                 bookingSnaps.forEach(doc => {
                     const booking = doc.data();
-                    
-                    // 3. Filter: Is this booking for one of MY cars?
                     if (myCarNames.includes(booking.carName)) {
                         count++;
                         html += `
@@ -444,7 +466,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <h4 style="color:#c84e08; margin-bottom:0.2rem;">${booking.carName}</h4>
                                 <p style="color:#ddd; font-size:0.9rem;"><strong>Customer:</strong> ${booking.customerName || 'N/A'}</p>
                                 <p style="color:#ddd; font-size:0.9rem;"><strong>Phone:</strong> ${booking.phone || 'N/A'}</p>
-                                <p style="color:#ddd; font-size:0.9rem;"><strong>Location:</strong> ${booking.location || 'N/A'}</p> <p style="color:#888; font-size:0.8rem;">${booking.dateRange}</p>
+                                <p style="color:#ddd; font-size:0.9rem;"><strong>Location:</strong> ${booking.location || 'N/A'}</p> 
+                                <p style="color:#888; font-size:0.8rem;">${booking.dateRange}</p>
                             </div>
                             <div style="text-align:right;">
                                 <p style="color:white; font-weight:bold;">RM${booking.totalPrice}</p>
