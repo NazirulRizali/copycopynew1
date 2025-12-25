@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - COMPLETE (Auth, Booking, Support, Location, Validation, PDF, Profile)
+   script.js - COMPLETE (Auth, Booking, Support, Location, Validation, PDF, Profile, Vendor)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -171,7 +171,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Signup Logic (UPDATED: Saves Role)
+    // ============================================
+    // UPDATED SIGNUP LOGIC (Saves Role)
+    // ============================================
     const signupBtn = document.getElementById('btn-signup-action');
     if (signupBtn) {
         signupBtn.addEventListener('click', (e) => {
@@ -185,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const phoneNum = document.getElementById('signup-phone').value;
             const terms = document.getElementById('signup-terms').checked;
             
-            // NEW: Get Role
+            // Get Role from Dropdown
             const role = document.getElementById('signup-role').value;
 
             if (!terms) {
@@ -206,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             age: age, 
                             country: country, 
                             phone: `${countryCode} ${phoneNum}`,
-                            role: role, // <--- SAVED HERE
+                            role: role, // Saves "customer" or "vendor"
                             createdAt: new Date()
                         });
                     })
@@ -222,52 +224,53 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-            // 2. Check if other fields are filled
-            if (email && pass && name && phoneNum && age && country) {
-                auth.createUserWithEmailAndPassword(email, pass)
-                    .then((userCredential) => {
-                        const user = userCredential.user;
-                        user.sendEmailVerification();
-                        
-                        // Save extra fields including PHONE to Firestore
-                        return db.collection("users").doc(user.uid).set({
-                            fullName: name, 
-                            email: email, 
-                            age: age, 
-                            country: country, 
-                            phone: `${countryCode} ${phoneNum}`, // Saves formatted phone
-                            createdAt: new Date()
-                        });
-                    })
-                    .then(() => auth.signOut())
-                    .then(() => {
-                        alert("Account created! Please verify your email before logging in.");
-                        window.location.href = 'login.html';
-                    })
-                    .catch((error) => alert(error.message));
-            } else { 
-                alert("Please fill in all fields."); 
-            }
-        });
-    }
-
-    // Login
+    // ============================================
+    // UPDATED LOGIN LOGIC (Checks Role)
+    // ============================================
     const loginBtn = document.getElementById('btn-login-action');
     if (loginBtn) {
         loginBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            const email = document.querySelector('input[type="text"]').value || document.querySelector('input[type="email"]').value;
-            const pass = document.querySelector('input[type="password"]').value;
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            
+            // The role the user claims to be right now
+            const selectedRole = document.getElementById('login-role').value; 
 
             if (email && pass) {
                 auth.signInWithEmailAndPassword(email, pass)
                     .then((userCredential) => {
-                        if (userCredential.user.emailVerified) {
-                            window.location.href = 'index.html';
-                        } else {
+                        const user = userCredential.user;
+
+                        if (!user.emailVerified) {
                             auth.signOut();
                             alert("Email not verified. Please check your inbox.");
+                            return;
                         }
+
+                        // CHECK DATABASE FOR REAL ROLE
+                        db.collection("users").doc(user.uid).get().then((doc) => {
+                            if (doc.exists) {
+                                const registeredRole = doc.data().role || 'customer'; // Default to customer if missing
+
+                                if (registeredRole === selectedRole) {
+                                    // MATCH: Access Granted
+                                    if (registeredRole === 'vendor') {
+                                        window.location.href = 'vendor.html';
+                                    } else {
+                                        window.location.href = 'index.html';
+                                    }
+                                } else {
+                                    // MISMATCH: Access Denied
+                                    auth.signOut();
+                                    alert(`Login Failed: You are registered as a '${registeredRole.toUpperCase()}', but you tried to login as a '${selectedRole.toUpperCase()}'. Please change your selection.`);
+                                }
+                            } else {
+                                // Fallback if user doc deleted
+                                auth.signOut();
+                                alert("User record not found.");
+                            }
+                        });
                     })
                     .catch((error) => alert("Login Failed: " + error.message));
             } else { alert("Enter email and password."); }
@@ -282,21 +285,55 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Page Protection
+    // ============================================
+    // UPDATED PAGE PROTECTION (Role-Based)
+    // ============================================
     auth.onAuthStateChanged((user) => {
         const path = window.location.pathname;
         const page = path.split("/").pop();
-        const isPublic = path.includes('login') || path.includes('signup') || path.includes('verify');
-        const isPrivate = path.includes('index') || path.includes('my-bookings') || path.includes('profile');
+        
+        // Define which pages belong to who
+        const publicPages = ['login.html', 'signup.html', 'verify.html'];
+        const customerPages = ['index.html', 'my-bookings.html', 'profile.html', 'car-list.html', 'booking.html', 'support.html'];
+        const vendorPages = ['vendor.html'];
 
         if (user) {
-            if (!user.emailVerified && isPrivate) {
+            // User is logged in
+            if (!user.emailVerified && !publicPages.some(p => path.includes(p))) {
+                // If email not verified, kick to login
                 auth.signOut().then(() => window.location.href = 'login.html');
-            } else if (user.emailVerified && isPublic) {
-                window.location.href = 'index.html';
+                return;
             }
+
+            // CHECK ROLE PERMISSION
+            db.collection("users").doc(user.uid).get().then((doc) => {
+                if (doc.exists) {
+                    const role = doc.data().role || 'customer';
+
+                    // 1. If Vendor tries to access Customer pages -> Redirect to Vendor Dashboard
+                    if (role === 'vendor' && customerPages.some(p => path.includes(p))) {
+                        window.location.href = 'vendor.html';
+                    }
+
+                    // 2. If Customer tries to access Vendor pages -> Redirect to Home
+                    if (role === 'customer' && vendorPages.some(p => path.includes(p))) {
+                        alert("Access Denied: Vendors Only.");
+                        window.location.href = 'index.html';
+                    }
+                }
+            });
+
+            // Prevent logged-in users from seeing Login/Signup
+            if (publicPages.some(p => path.includes(p))) {
+                if (!path.includes('verify.html')) window.location.href = 'index.html';
+            }
+
         } else {
-            if (isPrivate) window.location.href = 'login.html';
+            // User is NOT logged in
+            // If they try to access ANY private page (Customer OR Vendor), kick to login
+            if (customerPages.some(p => path.includes(p)) || vendorPages.some(p => path.includes(p))) {
+                window.location.href = 'login.html';
+            }
         }
     });
 
@@ -656,7 +693,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-   // ---------------------------------------------------------
+    // ---------------------------------------------------------
     // 8. VENDOR & DYNAMIC CAR LIST LOGIC (NEW)
     // ---------------------------------------------------------
 
