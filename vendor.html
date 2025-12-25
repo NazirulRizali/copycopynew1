@@ -10,6 +10,24 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* Simple style for the active tab */
+        .nav-tab {
+            margin-right: 20px;
+            text-decoration: none;
+            color: #ccc;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .nav-tab:hover { color: white; }
+        .nav-tab.active {
+            color: #c84e08; /* Orange */
+            border-bottom: 2px solid #c84e08;
+            padding-bottom: 5px;
+        }
+    </style>
 </head>
 <body class="bg-image">
 
@@ -17,14 +35,17 @@
         <div class="logo">
             <span class="logo-orange">SafeRent</span> <span class="logo-white">Vendor</span>
         </div>
+        
         <div class="nav-links">
-            <a href="#" class="btn-logout">Logout</a>
+            <a id="tab-add-car" class="nav-tab active">List Car</a>
+            <a id="tab-orders" class="nav-tab">Customer Orders</a>
+            <a href="#" class="btn-logout" style="margin-left: 20px; background-color: #c84e08; padding: 5px 15px; border-radius: 4px;">Logout</a>
         </div>
     </nav>
 
-    <div class="login-wrapper" style="margin-top: 100px; padding-bottom: 50px; flex-direction: column; gap: 2rem;">
+    <div class="login-wrapper" style="margin-top: 100px; padding-bottom: 50px; flex-direction: column; align-items: center;">
         
-        <div class="login-card" style="max-width: 600px; width: 100%;">
+        <div id="view-add-car" class="login-card" style="max-width: 600px; width: 100%;">
             <h2>Add a New Car</h2>
             <p style="color:#aaa; text-align:center; margin-bottom:20px;">List your vehicle for rent on the platform.</p>
             
@@ -63,7 +84,7 @@
             </form>
         </div>
 
-        <div class="login-card" style="max-width: 800px; width: 100%;">
+        <div id="view-orders" class="login-card" style="max-width: 800px; width: 100%; display: none;">
             <h2 style="margin-bottom: 1.5rem; border-bottom: 1px solid #333; padding-bottom: 1rem;">Customer Orders</h2>
             
             <div id="vendor-orders-list" style="display: flex; flex-direction: column; gap: 1rem;">
