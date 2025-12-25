@@ -23,13 +23,10 @@
         Your browser does not support the video tag.
     </video>
 
-
-<div class="logo-text">
+    <div class="logo-text">
         <span style="color: #D35400;">SafeRent</span> <span style="color: white;">Car</span>
     </div>
 
-
-    
     <div class="login-wrapper">
         <div class="login-card">
             <h2>Login</h2>
@@ -40,6 +37,13 @@
                 </div>
                 <div class="input-group">
                     <input type="password" id="login-pass" placeholder="Password" required>
+                </div>
+
+                <div class="input-group">
+                    <select id="login-role" style="width: 100%; background-color: rgba(43, 43, 43, 0.9); border: 1px solid transparent; padding: 0.9rem 1rem; border-radius: 8px; color: #e0e0e0; outline: none; cursor: pointer;">
+                        <option value="customer">Login as Customer</option>
+                        <option value="vendor">Login as Vendor</option>
+                    </select>
                 </div>
                 
                 <div style="text-align: right; margin-bottom: 1rem; margin-top: -0.5rem;">
@@ -61,7 +65,6 @@
                 <h3>Reset Password</h3>
                 <button id="close-reset-modal" class="btn-close">&times;</button>
             </div>
-            
             <div style="padding: 1.5rem;">
                 <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 1rem;">
                     Enter your email address and we'll send you a link to reset your password.
@@ -72,14 +75,11 @@
                            style="width: 100%; padding: 0.8rem; background: #161c27; border: 1px solid #4b5563; color: white; border-radius: 4px;">
                 </div>
             </div>
-
             <div class="modal-footer">
                 <button id="btn-send-reset" class="btn-pay-modal">Send Reset Link</button>
             </div>
         </div>
     </div>
-
-    
 
     <script src="script.js"></script>
 
