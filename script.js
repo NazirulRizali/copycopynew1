@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Signup Logic (UPDATED: Checks Terms & Conditions)
+    // Signup Logic (UPDATED: Saves Role)
     const signupBtn = document.getElementById('btn-signup-action');
     if (signupBtn) {
         signupBtn.addEventListener('click', (e) => {
@@ -181,19 +181,46 @@ document.addEventListener('DOMContentLoaded', () => {
             const name = document.getElementById('signup-name').value;
             const age = document.getElementById('signup-age').value;
             const country = document.getElementById('signup-country').value;
-            
-            // Get Phone Info
             const countryCode = document.getElementById('signup-country-code').value;
             const phoneNum = document.getElementById('signup-phone').value;
-
-            // NEW: Get Terms Checkbox Status
             const terms = document.getElementById('signup-terms').checked;
+            
+            // NEW: Get Role
+            const role = document.getElementById('signup-role').value;
 
-            // 1. Check if Terms are ticked
             if (!terms) {
-                alert("You must agree to the Terms and Conditions to register.");
-                return; // Stop here!
+                alert("You must agree to the Terms and Conditions.");
+                return;
             }
+
+            if (email && pass && name && phoneNum && age && country) {
+                auth.createUserWithEmailAndPassword(email, pass)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        user.sendEmailVerification();
+                        
+                        // SAVE ROLE TO DATABASE
+                        return db.collection("users").doc(user.uid).set({
+                            fullName: name, 
+                            email: email, 
+                            age: age, 
+                            country: country, 
+                            phone: `${countryCode} ${phoneNum}`,
+                            role: role, // <--- SAVED HERE
+                            createdAt: new Date()
+                        });
+                    })
+                    .then(() => auth.signOut())
+                    .then(() => {
+                        alert("Account created! Please verify your email before logging in.");
+                        window.location.href = 'login.html';
+                    })
+                    .catch((error) => alert(error.message));
+            } else { 
+                alert("Please fill in all fields."); 
+            }
+        });
+    }
 
             // 2. Check if other fields are filled
             if (email && pass && name && phoneNum && age && country) {
