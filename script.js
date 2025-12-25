@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         else window.location.href = 'index.html';
                     }
                     
-                    // NEW: LOAD VENDOR ORDERS
+                    // LOAD VENDOR ORDERS
                     if (role === 'vendor' && path.includes('vendor.html')) {
                         loadVendorOrders(user.uid);
                     }
@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         dateRange: `${formatD(date1)} to ${formatD(date2)}`,
                         totalPrice: total.toFixed(2), 
                         phone: userPhone, 
-                        customerName: userName, // <--- ADDED CUSTOMER NAME
+                        customerName: userName, 
                         status: "Active", 
                         paymentMethod: selectedMethod, 
                         createdAt: new Date()
@@ -397,7 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 category: document.getElementById('v-category').value,
                 image: document.getElementById('v-image').value,
                 description: document.getElementById('v-desc').value,
-                vendorId: auth.currentUser.uid, // <--- TAG WITH VENDOR ID
+                vendorId: auth.currentUser.uid, // TAG WITH VENDOR ID
                 createdAt: new Date()
             };
 
@@ -410,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // NEW FUNCTION: FETCH AND DISPLAY VENDOR ORDERS
+    // NEW FUNCTION: FETCH AND DISPLAY VENDOR ORDERS (UPDATED WITH LOCATION)
     function loadVendorOrders(vendorUid) {
         const listDiv = document.getElementById('vendor-orders-list');
         if (!listDiv) return;
@@ -444,7 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <h4 style="color:#c84e08; margin-bottom:0.2rem;">${booking.carName}</h4>
                                 <p style="color:#ddd; font-size:0.9rem;"><strong>Customer:</strong> ${booking.customerName || 'N/A'}</p>
                                 <p style="color:#ddd; font-size:0.9rem;"><strong>Phone:</strong> ${booking.phone || 'N/A'}</p>
-                                <p style="color:#888; font-size:0.8rem;">${booking.dateRange}</p>
+                                <p style="color:#ddd; font-size:0.9rem;"><strong>Location:</strong> ${booking.location || 'N/A'}</p> <p style="color:#888; font-size:0.8rem;">${booking.dateRange}</p>
                             </div>
                             <div style="text-align:right;">
                                 <p style="color:white; font-weight:bold;">RM${booking.totalPrice}</p>
