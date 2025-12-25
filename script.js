@@ -286,51 +286,54 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ============================================
-    // UPDATED PAGE PROTECTION (Role-Based)
+    // UPDATED PAGE PROTECTION (Role-Based - FIX FLICKER)
     // ============================================
     auth.onAuthStateChanged((user) => {
         const path = window.location.pathname;
         const page = path.split("/").pop();
         
-        // Define which pages belong to who
         const publicPages = ['login.html', 'signup.html', 'verify.html'];
         const customerPages = ['index.html', 'my-bookings.html', 'profile.html', 'car-list.html', 'booking.html', 'support.html'];
         const vendorPages = ['vendor.html'];
 
         if (user) {
-            // User is logged in
+            // 1. Enforce Email Verification
             if (!user.emailVerified && !publicPages.some(p => path.includes(p))) {
-                // If email not verified, kick to login
                 auth.signOut().then(() => window.location.href = 'login.html');
                 return;
             }
 
-            // CHECK ROLE PERMISSION
+            // 2. CHECK ROLE & REDIRECT CORRECTLY
             db.collection("users").doc(user.uid).get().then((doc) => {
                 if (doc.exists) {
                     const role = doc.data().role || 'customer';
 
-                    // 1. If Vendor tries to access Customer pages -> Redirect to Vendor Dashboard
+                    // SITUATION A: Vendor on Customer Page -> Send to Vendor Dash
                     if (role === 'vendor' && customerPages.some(p => path.includes(p))) {
                         window.location.href = 'vendor.html';
+                        return;
                     }
 
-                    // 2. If Customer tries to access Vendor pages -> Redirect to Home
+                    // SITUATION B: Customer on Vendor Page -> Send to Home
                     if (role === 'customer' && vendorPages.some(p => path.includes(p))) {
-                        alert("Access Denied: Vendors Only.");
                         window.location.href = 'index.html';
+                        return;
+                    }
+
+                    // SITUATION C: User is on Login/Signup (Public) -> Send to their correct dashboard
+                    // This fixes the flicker by checking role BEFORE redirecting
+                    if (publicPages.some(p => path.includes(p)) && !path.includes('verify.html')) {
+                        if (role === 'vendor') {
+                            window.location.href = 'vendor.html';
+                        } else {
+                            window.location.href = 'index.html';
+                        }
                     }
                 }
             });
 
-            // Prevent logged-in users from seeing Login/Signup
-            if (publicPages.some(p => path.includes(p))) {
-                if (!path.includes('verify.html')) window.location.href = 'index.html';
-            }
-
         } else {
-            // User is NOT logged in
-            // If they try to access ANY private page (Customer OR Vendor), kick to login
+            // User is NOT logged in -> Kick them out of private pages
             if (customerPages.some(p => path.includes(p)) || vendorPages.some(p => path.includes(p))) {
                 window.location.href = 'login.html';
             }
