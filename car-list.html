@@ -32,67 +32,27 @@
             <h1>CAR LIST</h1>
         </div>
 
-        <section class="car-section">
+        <section class="car-section" id="section-Economy" style="display:none;">
             <h3>Economy & Compact</h3>
-            <div class="car-grid">
-                
-                <div class="car-card">
-                    <div class="car-image-box">
-                        <img src="images/Vios.jpg" alt="Toyota Vios" class="car-img">
-                    </div>
-                    <div class="car-details">
-                        <h4>Toyota Vios</h4>
-                        <p class="price">RM35 <span class="per-day">/ day</span></p>
-                        <p class="description">Fuel-efficient, perfect for city travel.</p>
-                        <button class="btn-select" data-name="Toyota Vios" data-price="35">Select</button>
-                    </div>
+            <div class="car-grid" id="grid-Economy">
                 </div>
-
-                <div class="car-card">
-                    <div class="car-image-box">
-                        <img src="images/suv1.png" alt="Honda CR-V" class="car-img">
-                    </div>
-                    <div class="car-details">
-                        <h4>Honda CR-V</h4>
-                        <p class="price">RM60 <span class="per-day">/ day</span></p>
-                        <p class="description">Reliable, modern SUV with premium comfort.</p>
-                        <button class="btn-select" data-name="Honda CR-V" data-price="60">Select</button>
-                    </div>
-                </div>
-
-                <div class="car-card">
-                    <div class="car-image-box">
-                        <img src="images/Clio.jpg" alt="Renault Clio" class="car-img">
-                    </div>
-                    <div class="car-details">
-                        <h4>Renault Clio</h4>
-                        <p class="price">RM30 <span class="per-day">/ day</span></p>
-                        <p class="description">Compact hatchback, best budget option.</p>
-                        <button class="btn-select" data-name="Renault Clio" data-price="30">Select</button>
-                    </div>
-                </div>
-
-            </div>
         </section>
 
-        <section class="car-section">
+        <section class="car-section" id="section-SUV" style="display:none;">
+            <h3>SUV & Family</h3>
+            <div class="car-grid" id="grid-SUV">
+                </div>
+        </section>
+
+        <section class="car-section" id="section-Sports" style="display:none;">
             <h3>Sports & Performance</h3>
-            <div class="car-grid">
-                
-                <div class="car-card">
-                    <div class="car-image-box">
-                        <img src="images/Mustang.jpg" alt="Ford Mustang GT" class="car-img">
-                    </div>
-                    <div class="car-details">
-                        <h4>Ford Mustang GT</h4>
-                        <p class="price">RM120 <span class="per-day">/ day</span></p>
-                        <p class="description">High performance V8 engine for an iconic drive.</p>
-                        <button class="btn-select" data-name="Ford Mustang GT" data-price="120">Select</button>
-                    </div>
+            <div class="car-grid" id="grid-Sports">
                 </div>
-
-            </div>
         </section>
+
+        <div id="no-cars-msg" style="display:none; text-align:center; color:#9ca3af; margin-top:2rem;">
+            <p>No cars available at the moment. Please check back later.</p>
+        </div>
 
         <div class="action-area">
             <button class="btn-modify" onclick="window.location.href='index.html'">
