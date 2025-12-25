@@ -629,5 +629,93 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+   // ---------------------------------------------------------
+    // 8. VENDOR & DYNAMIC CAR LIST LOGIC (NEW)
+    // ---------------------------------------------------------
+
+    // A. Handle Vendor Adding a Car
+    const vendorForm = document.getElementById('vendor-form');
+    if (vendorForm) {
+        vendorForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = vendorForm.querySelector('button');
+            btn.textContent = "Publishing...";
+            btn.disabled = true;
+
+            const newCar = {
+                name: document.getElementById('v-name').value,
+                price: parseFloat(document.getElementById('v-price').value),
+                category: document.getElementById('v-category').value,
+                image: document.getElementById('v-image').value,
+                description: document.getElementById('v-desc').value,
+                createdAt: new Date()
+            };
+
+            db.collection("cars").add(newCar).then(() => {
+                alert("Car Published Successfully!");
+                vendorForm.reset();
+                btn.textContent = "Publish Car";
+                btn.disabled = false;
+            }).catch((error) => {
+                alert("Error: " + error.message);
+                btn.textContent = "Publish Car";
+                btn.disabled = false;
+            });
+        });
+    }
+
+    // B. Handle Displaying Cars on car-list.html
+    const economyGrid = document.getElementById('grid-Economy');
+    const suvGrid = document.getElementById('grid-SUV');
+    const sportsGrid = document.getElementById('grid-Sports');
+
+    if (economyGrid || suvGrid || sportsGrid) {
+        console.log("Loading cars...");
+        
+        db.collection("cars").get().then((querySnapshot) => {
+            if (querySnapshot.empty) {
+                // If DB is empty, maybe show default hardcoded ones or a message?
+                console.log("No cars found in database.");
+            }
+
+            querySnapshot.forEach((doc) => {
+                const car = doc.data();
+                const carHTML = `
+                <div class="car-card">
+                    <div class="car-image-box">
+                        <img src="${car.image}" alt="${car.name}" class="car-img" onerror="this.src='images/Vios.jpg'">
+                    </div>
+                    <div class="car-details">
+                        <h4>${car.name}</h4>
+                        <p class="price">RM${car.price} <span class="per-day">/ day</span></p>
+                        <p class="description">${car.description}</p>
+                        <button class="btn-select" data-name="${car.name}" data-price="${car.price}">Select</button>
+                    </div>
+                </div>`;
+
+                // Inject into correct category
+                if (car.category === "Economy" && economyGrid) {
+                    document.getElementById('section-Economy').style.display = 'block';
+                    economyGrid.innerHTML += carHTML;
+                } else if (car.category === "SUV" && suvGrid) {
+                    document.getElementById('section-SUV').style.display = 'block';
+                    suvGrid.innerHTML += carHTML;
+                } else if (car.category === "Sports" && sportsGrid) {
+                    document.getElementById('section-Sports').style.display = 'block';
+                    sportsGrid.innerHTML += carHTML;
+                }
+            });
+
+            // Re-attach Event Listeners for the "Select" buttons (because we just added them dynamically)
+            document.querySelectorAll('.btn-select').forEach(button => {
+                button.addEventListener('click', function() {
+                    sessionStorage.setItem('selectedCarName', this.getAttribute('data-name'));
+                    sessionStorage.setItem('selectedCarPrice', this.getAttribute('data-price'));
+                    window.location.href = 'booking.html';
+                });
+            });
+        });
+    }
+
 // CLOSING BRACKET FOR DOMContentLoaded
 });
