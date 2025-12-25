@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Dashboard - SafeRent Car</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="login.css"> 
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-image">
+
+    <nav class="navbar" style="position: fixed; top: 0; width: 100%; z-index: 10;">
+        <div class="logo">
+            <span class="logo-orange">SafeRent</span> <span class="logo-white">Vendor</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Back to Home</a>
+        </div>
+    </nav>
+
+    <div class="login-wrapper" style="margin-top: 80px;">
+        <div class="login-card" style="max-width: 600px;">
+            <h2>Add a New Car</h2>
+            <p style="color:#aaa; text-align:center; margin-bottom:20px;">List your vehicle for rent on the platform.</p>
+            
+            <form id="vendor-form">
+                <div class="input-group">
+                    <label style="color:#ccc; font-size:0.9rem;">Car Model Name</label>
+                    <input type="text" id="v-name" placeholder="e.g., Toyota Camry 2.5" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="input-group">
+                        <label style="color:#ccc; font-size:0.9rem;">Price Per Day (RM)</label>
+                        <input type="number" id="v-price" placeholder="e.g., 150" required>
+                    </div>
+                    <div class="input-group">
+                        <label style="color:#ccc; font-size:0.9rem;">Category</label>
+                        <select id="v-category" style="width:100%; padding:0.9rem; background:#2b2b2b; color:white; border:none; border-radius:8px;">
+                            <option value="Economy">Economy & Compact</option>
+                            <option value="SUV">SUV & Family</option>
+                            <option value="Sports">Sports & Performance</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label style="color:#ccc; font-size:0.9rem;">Image Filename or URL</label>
+                    <input type="text" id="v-image" placeholder="e.g., images/Vios.jpg" value="images/Vios.jpg" required>
+                    <small style="color:#666; font-size: 0.7rem;">For this demo, use existing paths like 'images/Vios.jpg'</small>
+                </div>
+
+                <div class="input-group">
+                    <label style="color:#ccc; font-size:0.9rem;">Description</label>
+                    <textarea id="v-desc" rows="3" style="width:100%; background:#2b2b2b; color:white; border:none; padding:1rem; border-radius:8px;" placeholder="e.g., Fuel-efficient and comfortable..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-login" style="background-color: #c84e08; margin-top: 1rem;">Publish Car</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
