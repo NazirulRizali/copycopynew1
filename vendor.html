@@ -22,8 +22,9 @@
         </div>
     </nav>
 
-    <div class="login-wrapper" style="margin-top: 80px;">
-        <div class="login-card" style="max-width: 600px;">
+    <div class="login-wrapper" style="margin-top: 100px; padding-bottom: 50px; flex-direction: column; gap: 2rem;">
+        
+        <div class="login-card" style="max-width: 600px; width: 100%;">
             <h2>Add a New Car</h2>
             <p style="color:#aaa; text-align:center; margin-bottom:20px;">List your vehicle for rent on the platform.</p>
             
@@ -51,7 +52,6 @@
                 <div class="input-group">
                     <label style="color:#ccc; font-size:0.9rem;">Image Filename or URL</label>
                     <input type="text" id="v-image" placeholder="e.g., images/Vios.jpg" value="images/Vios.jpg" required>
-                    <small style="color:#666; font-size: 0.7rem;">For this demo, use existing paths like 'images/Vios.jpg'</small>
                 </div>
 
                 <div class="input-group">
@@ -62,6 +62,15 @@
                 <button type="submit" class="btn-login" style="background-color: #c84e08; margin-top: 1rem;">Publish Car</button>
             </form>
         </div>
+
+        <div class="login-card" style="max-width: 800px; width: 100%;">
+            <h2 style="margin-bottom: 1.5rem; border-bottom: 1px solid #333; padding-bottom: 1rem;">Customer Orders</h2>
+            
+            <div id="vendor-orders-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                <p style="text-align:center; color:gray;">Loading orders...</p>
+            </div>
+        </div>
+
     </div>
 
     <script src="script.js"></script>
