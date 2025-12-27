@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - COMPLETE (Auth, Booking, Support, Location, PDF, Profile, Vendor Tabs, Auto-Hide Rented)
+   script.js - COMPLETE (Auth, Booking, Support, Location, PDF, Vendor Tabs + Fleet Status)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -253,9 +253,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         else window.location.href = 'index.html';
                     }
                     
-                    // LOAD VENDOR ORDERS
+                    // LOAD VENDOR DASHBOARD
                     if (role === 'vendor' && path.includes('vendor.html')) {
-                        loadVendorOrders(user.uid);
+                        // By default load fleet & orders (hidden/shown by tabs)
+                        loadVendorFleet(user.uid);
                     }
                 }
             });
@@ -288,7 +289,6 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', function() {
             sessionStorage.setItem('selectedCarName', this.getAttribute('data-name'));
             sessionStorage.setItem('selectedCarPrice', this.getAttribute('data-price'));
-            // NEW: Save ID for updating status later
             sessionStorage.setItem('selectedCarId', this.getAttribute('data-id')); 
             window.location.href = 'booking.html';
         });
@@ -301,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dropoffStr = sessionStorage.getItem('dropoffDate') || "10/12/2025 11:00 AM";
         const carName = sessionStorage.getItem('selectedCarName') || "Toyota Vios";
         const carPrice = parseFloat(sessionStorage.getItem('selectedCarPrice')) || 35;
-        const carId = sessionStorage.getItem('selectedCarId'); // Get the ID
+        const carId = sessionStorage.getItem('selectedCarId'); 
 
         const date1 = parseDate(pickupStr);
         const date2 = parseDate(dropoffStr);
@@ -351,7 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const user = auth.currentUser;
                 finalPayBtn.textContent = "Processing..."; finalPayBtn.disabled = true;
 
-                // 1. Fetch User Data
                 db.collection("users").doc(user.uid).get().then((doc) => {
                     let userPhone = "N/A";
                     let userName = "Valued Customer";
@@ -375,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         .then((docRef) => {
                             newBooking.id = docRef.id.substring(0, 8).toUpperCase();
                             
-                            // NEW: MARK CAR AS RENTED (HIDES IT FROM LIST)
+                            // MARK CAR AS RENTED
                             if (carId) {
                                 db.collection("cars").doc(carId).update({ status: "Rented" })
                                 .catch(err => console.log("Error updating car status", err));
@@ -392,33 +391,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------
-    // 5. VENDOR LOGIC (UPDATED WITH TABS & STATUS)
+    // 5. VENDOR LOGIC (UPDATED WITH FLEET TAB & CUSTOMER DETAILS)
     // ---------------------------------------------------------
     
     // TAB SWITCHING LOGIC
     const tabAddCar = document.getElementById('tab-add-car');
+    const tabFleet = document.getElementById('tab-fleet');
     const tabOrders = document.getElementById('tab-orders');
+
     const viewAddCar = document.getElementById('view-add-car');
+    const viewFleet = document.getElementById('view-fleet');
     const viewOrders = document.getElementById('view-orders');
 
-    if (tabAddCar && tabOrders) {
+    if (tabAddCar && tabFleet && tabOrders) {
         tabAddCar.addEventListener('click', () => {
-            tabAddCar.classList.add('active');
-            tabOrders.classList.remove('active');
-            viewAddCar.style.display = 'block';
-            viewOrders.style.display = 'none';
+            setActiveTab(tabAddCar, viewAddCar);
         });
-
+        tabFleet.addEventListener('click', () => {
+            setActiveTab(tabFleet, viewFleet);
+            if(auth.currentUser) loadVendorFleet(auth.currentUser.uid);
+        });
         tabOrders.addEventListener('click', () => {
-            tabOrders.classList.add('active');
-            tabAddCar.classList.remove('active');
-            viewOrders.style.display = 'block';
-            viewAddCar.style.display = 'none';
+            setActiveTab(tabOrders, viewOrders);
             if(auth.currentUser) loadVendorOrders(auth.currentUser.uid);
         });
     }
 
-    // SUBMIT NEW CAR (UPDATED WITH STATUS: AVAILABLE)
+    function setActiveTab(activeTab, activeView) {
+        [tabAddCar, tabFleet, tabOrders].forEach(t => t.classList.remove('active'));
+        [viewAddCar, viewFleet, viewOrders].forEach(v => v.style.display = 'none');
+        activeTab.classList.add('active');
+        activeView.style.display = 'block';
+    }
+
+    // SUBMIT NEW CAR
     const vendorForm = document.getElementById('vendor-form');
     if (vendorForm) {
         vendorForm.addEventListener('submit', (e) => {
@@ -433,7 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 image: document.getElementById('v-image').value,
                 description: document.getElementById('v-desc').value,
                 vendorId: auth.currentUser.uid, 
-                status: "Available", // <--- NEW: Defaults to Available
+                status: "Available",
                 createdAt: new Date()
             };
 
@@ -441,31 +447,80 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Car Published Successfully!");
                 vendorForm.reset();
                 btn.textContent = "Publish Car"; btn.disabled = false;
-                loadVendorOrders(auth.currentUser.uid); 
             }).catch((error) => { alert("Error: " + error.message); btn.disabled = false; });
         });
     }
 
-    // FETCH AND DISPLAY VENDOR ORDERS
-    function loadVendorOrders(vendorUid) {
-        const listDiv = document.getElementById('vendor-orders-list');
+    // NEW FUNCTION: LOAD VENDOR FLEET WITH STATUS
+    function loadVendorFleet(vendorUid) {
+        const listDiv = document.getElementById('vendor-fleet-list');
         if (!listDiv) return;
+        listDiv.innerHTML = '<p style="text-align:center; color:gray;">Loading fleet...</p>';
 
-        listDiv.innerHTML = '<p style="text-align:center; color:gray;">Loading...</p>';
-
-        db.collection("cars").where("vendorId", "==", vendorUid).get().then((carSnaps) => {
+        // 1. Get Cars
+        db.collection("cars").where("vendorId", "==", vendorUid).get().then(async (carSnaps) => {
             if (carSnaps.empty) {
-                listDiv.innerHTML = '<p style="text-align:center; color:gray;">You haven\'t listed any cars yet.</p>';
+                listDiv.innerHTML = '<p style="text-align:center; color:gray;">No cars listed.</p>';
                 return;
             }
 
+            // 2. Prepare HTML
+            let html = '';
+            
+            // 3. We need active bookings to cross-reference "Rented" cars
+            const bookingsSnap = await db.collectionGroup('bookings').where('status', '==', 'Active').get();
+            const activeBookings = [];
+            bookingsSnap.forEach(doc => activeBookings.push(doc.data()));
+
+            carSnaps.forEach(doc => {
+                const car = doc.data();
+                const statusClass = car.status === 'Rented' ? 'status-rented' : 'status-avail';
+                
+                let customerInfo = '';
+                if (car.status === 'Rented') {
+                    // Find who rented this car
+                    const booking = activeBookings.find(b => b.carName === car.name);
+                    if (booking) {
+                        customerInfo = `
+                            <div style="margin-top:0.5rem; padding:0.5rem; background:#333; border-radius:4px; font-size:0.85rem;">
+                                <p style="color:#ffcc00; font-weight:bold; margin-bottom:0.2rem;">Currently Rented By:</p>
+                                <p><strong>Name:</strong> ${booking.customerName || 'N/A'}</p>
+                                <p><strong>Phone:</strong> ${booking.phone || 'N/A'}</p>
+                                <p><strong>Return:</strong> ${booking.dateRange.split(' to ')[1]}</p>
+                            </div>
+                        `;
+                    }
+                }
+
+                html += `
+                <div style="background:#222; padding:1rem; border-radius:8px; border:1px solid #444;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <h4 style="color:#c84e08; font-size:1.1rem;">${car.name}</h4>
+                        <span class="${statusClass}">${car.status}</span>
+                    </div>
+                    <p style="color:#ccc; font-size:0.9rem;">Price: RM${car.price}/day</p>
+                    ${customerInfo}
+                </div>`;
+            });
+
+            listDiv.innerHTML = html;
+        });
+    }
+
+    // FETCH ORDERS HISTORY (Existing)
+    function loadVendorOrders(vendorUid) {
+        const listDiv = document.getElementById('vendor-orders-list');
+        if (!listDiv) return;
+        listDiv.innerHTML = '<p style="text-align:center; color:gray;">Loading...</p>';
+
+        db.collection("cars").where("vendorId", "==", vendorUid).get().then((carSnaps) => {
+            if (carSnaps.empty) { listDiv.innerHTML = '<p style="text-align:center; color:gray;">No cars listed.</p>'; return; }
             const myCarNames = [];
             carSnaps.forEach(doc => myCarNames.push(doc.data().name));
 
             db.collectionGroup('bookings').get().then((bookingSnaps) => {
                 let html = '';
                 let count = 0;
-
                 bookingSnaps.forEach(doc => {
                     const booking = doc.data();
                     if (myCarNames.includes(booking.carName)) {
@@ -486,12 +541,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>`;
                     }
                 });
-
-                if (count === 0) {
-                    listDiv.innerHTML = '<p style="text-align:center; color:gray;">No orders yet.</p>';
-                } else {
-                    listDiv.innerHTML = html;
-                }
+                if (count === 0) listDiv.innerHTML = '<p style="text-align:center; color:gray;">No orders yet.</p>';
+                else listDiv.innerHTML = html;
             });
         }).catch(err => console.error(err));
     }
@@ -531,7 +582,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 button.addEventListener('click', function() {
                     sessionStorage.setItem('selectedCarName', this.getAttribute('data-name'));
                     sessionStorage.setItem('selectedCarPrice', this.getAttribute('data-price'));
-                    // Save ID for booking Logic
                     sessionStorage.setItem('selectedCarId', this.getAttribute('data-id'));
                     window.location.href = 'booking.html';
                 });
@@ -542,7 +592,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---------------------------------------------------------
     // 7. OTHER PAGE LOGIC (Support, Profile, My Bookings)
     // ---------------------------------------------------------
-    // My Bookings
     const bookingsListContainer = document.getElementById('bookings-list');
     if (bookingsListContainer) {
         auth.onAuthStateChanged((user) => {
@@ -592,7 +641,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Support Form
     const supportForm = document.getElementById('support-form');
     if (supportForm) {
         auth.onAuthStateChanged(user => {
@@ -614,7 +662,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Profile
     const profileForm = document.getElementById('profile-form');
     if (profileForm) {
         auth.onAuthStateChanged(user => {
