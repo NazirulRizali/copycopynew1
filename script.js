@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - COMPLETE (Auth, Booking, Support, Location, PDF, Vendor Tabs + Fleet Status)
+   script.js - COMPLETE (Auth, Booking, Support, Location, PDF, Vendor Tabs + Fleet Status Fix)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -451,59 +451,88 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // NEW FUNCTION: LOAD VENDOR FLEET WITH STATUS
+    // =========================================================
+    // FIXED: LOAD VENDOR FLEET WITH ROBUST FILTERING
+    // =========================================================
     function loadVendorFleet(vendorUid) {
         const listDiv = document.getElementById('vendor-fleet-list');
         if (!listDiv) return;
+        
         listDiv.innerHTML = '<p style="text-align:center; color:gray;">Loading fleet...</p>';
 
-        // 1. Get Cars
-        db.collection("cars").where("vendorId", "==", vendorUid).get().then(async (carSnaps) => {
+        // 1. Get Cars belonging to this vendor
+        db.collection("cars").where("vendorId", "==", vendorUid).get()
+        .then(async (carSnaps) => {
             if (carSnaps.empty) {
-                listDiv.innerHTML = '<p style="text-align:center; color:gray;">No cars listed.</p>';
+                listDiv.innerHTML = '<p style="text-align:center; color:gray;">You haven\'t added any cars yet.</p>';
                 return;
             }
 
-            // 2. Prepare HTML
-            let html = '';
-            
-            // 3. We need active bookings to cross-reference "Rented" cars
-            const bookingsSnap = await db.collectionGroup('bookings').where('status', '==', 'Active').get();
-            const activeBookings = [];
-            bookingsSnap.forEach(doc => activeBookings.push(doc.data()));
+            // 2. Safer Fetch: Get ALL bookings first, then filter in JS
+            // This prevents the "Missing Index" error that causes the loading to hang
+            let activeBookings = [];
+            try {
+                // Fetch ALL bookings from all users (Collection Group)
+                const bookingsSnap = await db.collectionGroup('bookings').get();
+                
+                // Filter manually for 'Active' status
+                bookingsSnap.forEach(doc => {
+                    const data = doc.data();
+                    if (data.status === 'Active') {
+                        activeBookings.push(data);
+                    }
+                });
+            } catch (err) {
+                console.log("Error fetching bookings:", err);
+                // We continue even if this fails, just so the cars still show up
+            }
 
+            // 3. Build HTML
+            let html = '';
             carSnaps.forEach(doc => {
                 const car = doc.data();
                 const statusClass = car.status === 'Rented' ? 'status-rented' : 'status-avail';
                 
                 let customerInfo = '';
                 if (car.status === 'Rented') {
-                    // Find who rented this car
+                    // Match car name to booking
                     const booking = activeBookings.find(b => b.carName === car.name);
                     if (booking) {
                         customerInfo = `
-                            <div style="margin-top:0.5rem; padding:0.5rem; background:#333; border-radius:4px; font-size:0.85rem;">
-                                <p style="color:#ffcc00; font-weight:bold; margin-bottom:0.2rem;">Currently Rented By:</p>
-                                <p><strong>Name:</strong> ${booking.customerName || 'N/A'}</p>
-                                <p><strong>Phone:</strong> ${booking.phone || 'N/A'}</p>
-                                <p><strong>Return:</strong> ${booking.dateRange.split(' to ')[1]}</p>
+                            <div style="margin-top:0.8rem; padding:0.8rem; background:#2d3748; border-radius:6px; border:1px solid #4a5568;">
+                                <p style="color:#c84e08; font-size:0.85rem; font-weight:bold; margin-bottom:0.4rem; text-transform:uppercase;">
+                                    <i class="fa-solid fa-user"></i> Renter Details
+                                </p>
+                                <p style="color:#e2e8f0; font-size:0.9rem; margin-bottom:0.2rem;"><strong>Name:</strong> ${booking.customerName || 'N/A'}</p>
+                                <p style="color:#e2e8f0; font-size:0.9rem; margin-bottom:0.2rem;"><strong>Phone:</strong> ${booking.phone || 'N/A'}</p>
+                                <p style="color:#9ca3af; font-size:0.8rem;"><strong>Return Date:</strong> ${booking.dateRange.split(' to ')[1] || 'N/A'}</p>
                             </div>
                         `;
+                    } else {
+                        customerInfo = `<p style="color:#9ca3af; font-size:0.8rem; margin-top:0.5rem;"><em>Rented, but booking details unavailable.</em></p>`;
                     }
                 }
 
                 html += `
-                <div style="background:#222; padding:1rem; border-radius:8px; border:1px solid #444;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <h4 style="color:#c84e08; font-size:1.1rem;">${car.name}</h4>
-                        <span class="${statusClass}">${car.status}</span>
+                <div style="background:#1a202c; padding:1.2rem; border-radius:8px; border:1px solid #2d3748; margin-bottom: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 0.5rem;">
+                        <div>
+                            <h4 style="color:white; font-size:1.1rem; font-weight:700; margin-bottom:0.2rem;">${car.name}</h4>
+                            <p style="color:#a0aec0; font-size:0.85rem;">RM${car.price} / day</p>
+                        </div>
+                        <span class="${statusClass}" style="padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">
+                            ${car.status || 'Available'}
+                        </span>
                     </div>
-                    <p style="color:#ccc; font-size:0.9rem;">Price: RM${car.price}/day</p>
                     ${customerInfo}
                 </div>`;
             });
 
             listDiv.innerHTML = html;
+        })
+        .catch(err => {
+            console.error(err);
+            listDiv.innerHTML = '<p style="text-align:center; color:#ef4444;">Error loading fleet. Check console.</p>';
         });
     }
 
