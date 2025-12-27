@@ -12,7 +12,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
-        /* Simple style for the active tab */
         .nav-tab {
             margin-right: 20px;
             text-decoration: none;
@@ -23,10 +22,13 @@
         }
         .nav-tab:hover { color: white; }
         .nav-tab.active {
-            color: #c84e08; /* Orange */
+            color: #c84e08;
             border-bottom: 2px solid #c84e08;
             padding-bottom: 5px;
         }
+        /* Status Badges for the Fleet List */
+        .status-avail { background-color: #28a745; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; }
+        .status-rented { background-color: #dc3545; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; }
     </style>
 </head>
 <body class="bg-image">
@@ -37,8 +39,8 @@
         </div>
         
         <div class="nav-links">
-            <a id="tab-add-car" class="nav-tab active">List Car</a>
-            <a id="tab-orders" class="nav-tab">Customer Orders</a>
+            <a id="tab-add-car" class="nav-tab active">Add Car</a>
+            <a id="tab-fleet" class="nav-tab">My Fleet</a> <a id="tab-orders" class="nav-tab">Orders</a>
             <a href="#" class="btn-logout" style="margin-left: 20px; background-color: #c84e08; padding: 5px 15px; border-radius: 4px;">Logout</a>
         </div>
     </nav>
@@ -48,13 +50,11 @@
         <div id="view-add-car" class="login-card" style="max-width: 600px; width: 100%;">
             <h2>Add a New Car</h2>
             <p style="color:#aaa; text-align:center; margin-bottom:20px;">List your vehicle for rent on the platform.</p>
-            
             <form id="vendor-form">
                 <div class="input-group">
                     <label style="color:#ccc; font-size:0.9rem;">Car Model Name</label>
                     <input type="text" id="v-name" placeholder="e.g., Toyota Camry 2.5" required>
                 </div>
-
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="input-group">
                         <label style="color:#ccc; font-size:0.9rem;">Price Per Day (RM)</label>
@@ -69,24 +69,27 @@
                         </select>
                     </div>
                 </div>
-
                 <div class="input-group">
                     <label style="color:#ccc; font-size:0.9rem;">Image Filename or URL</label>
                     <input type="text" id="v-image" placeholder="e.g., images/Vios.jpg" value="images/Vios.jpg" required>
                 </div>
-
                 <div class="input-group">
                     <label style="color:#ccc; font-size:0.9rem;">Description</label>
                     <textarea id="v-desc" rows="3" style="width:100%; background:#2b2b2b; color:white; border:none; padding:1rem; border-radius:8px;" placeholder="e.g., Fuel-efficient and comfortable..."></textarea>
                 </div>
-
                 <button type="submit" class="btn-login" style="background-color: #c84e08; margin-top: 1rem;">Publish Car</button>
             </form>
         </div>
 
+        <div id="view-fleet" class="login-card" style="max-width: 800px; width: 100%; display: none;">
+            <h2 style="margin-bottom: 1.5rem; border-bottom: 1px solid #333; padding-bottom: 1rem;">My Fleet Status</h2>
+            <div id="vendor-fleet-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                <p style="text-align:center; color:gray;">Loading fleet...</p>
+            </div>
+        </div>
+
         <div id="view-orders" class="login-card" style="max-width: 800px; width: 100%; display: none;">
-            <h2 style="margin-bottom: 1.5rem; border-bottom: 1px solid #333; padding-bottom: 1rem;">Customer Orders</h2>
-            
+            <h2 style="margin-bottom: 1.5rem; border-bottom: 1px solid #333; padding-bottom: 1rem;">Customer Orders History</h2>
             <div id="vendor-orders-list" style="display: flex; flex-direction: column; gap: 1rem;">
                 <p style="text-align:center; color:gray;">Loading orders...</p>
             </div>
