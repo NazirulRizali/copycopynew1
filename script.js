@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - COMPLETE (Auth, Booking, Support, Location, PDF, Profile, Vendor Orders & Tabs)
+   script.js - COMPLETE (Auth, Booking, Support, Location, PDF, Profile, Vendor Tabs, Auto-Hide Rented)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ---------------------------------------------------------
-    // 4. BOOKING LOGIC
+    // 4. BOOKING LOGIC (UPDATED WITH AUTO-HIDE)
     // ---------------------------------------------------------
     const searchBtn = document.getElementById('search-btn');
     if (searchBtn) {
@@ -288,6 +288,8 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', function() {
             sessionStorage.setItem('selectedCarName', this.getAttribute('data-name'));
             sessionStorage.setItem('selectedCarPrice', this.getAttribute('data-price'));
+            // NEW: Save ID for updating status later
+            sessionStorage.setItem('selectedCarId', this.getAttribute('data-id')); 
             window.location.href = 'booking.html';
         });
     });
@@ -299,6 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dropoffStr = sessionStorage.getItem('dropoffDate') || "10/12/2025 11:00 AM";
         const carName = sessionStorage.getItem('selectedCarName') || "Toyota Vios";
         const carPrice = parseFloat(sessionStorage.getItem('selectedCarPrice')) || 35;
+        const carId = sessionStorage.getItem('selectedCarId'); // Get the ID
 
         const date1 = parseDate(pickupStr);
         const date2 = parseDate(dropoffStr);
@@ -348,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const user = auth.currentUser;
                 finalPayBtn.textContent = "Processing..."; finalPayBtn.disabled = true;
 
-                // 1. Fetch User Data (Phone + Full Name)
+                // 1. Fetch User Data
                 db.collection("users").doc(user.uid).get().then((doc) => {
                     let userPhone = "N/A";
                     let userName = "Valued Customer";
@@ -371,6 +374,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     return db.collection("users").doc(user.uid).collection("bookings").add(newBooking)
                         .then((docRef) => {
                             newBooking.id = docRef.id.substring(0, 8).toUpperCase();
+                            
+                            // NEW: MARK CAR AS RENTED (HIDES IT FROM LIST)
+                            if (carId) {
+                                db.collection("cars").doc(carId).update({ status: "Rented" })
+                                .catch(err => console.log("Error updating car status", err));
+                            }
+
                             generateDetailedPDF(newBooking, diffDays, rentalFee, insurance, taxes, newBooking.phone, selectedMethod);
                             modal.style.display = 'none';
                             setTimeout(() => { window.location.href = 'my-bookings.html'; }, 2000);
@@ -382,10 +392,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------
-    // 5. VENDOR LOGIC
+    // 5. VENDOR LOGIC (UPDATED WITH TABS & STATUS)
     // ---------------------------------------------------------
     
-    // TAB SWITCHING LOGIC (NEW)
+    // TAB SWITCHING LOGIC
     const tabAddCar = document.getElementById('tab-add-car');
     const tabOrders = document.getElementById('tab-orders');
     const viewAddCar = document.getElementById('view-add-car');
@@ -404,12 +414,11 @@ document.addEventListener('DOMContentLoaded', () => {
             tabAddCar.classList.remove('active');
             viewOrders.style.display = 'block';
             viewAddCar.style.display = 'none';
-            // Refresh orders when tab clicked
             if(auth.currentUser) loadVendorOrders(auth.currentUser.uid);
         });
     }
 
-    // SUBMIT NEW CAR
+    // SUBMIT NEW CAR (UPDATED WITH STATUS: AVAILABLE)
     const vendorForm = document.getElementById('vendor-form');
     if (vendorForm) {
         vendorForm.addEventListener('submit', (e) => {
@@ -424,6 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 image: document.getElementById('v-image').value,
                 description: document.getElementById('v-desc').value,
                 vendorId: auth.currentUser.uid, 
+                status: "Available", // <--- NEW: Defaults to Available
                 createdAt: new Date()
             };
 
@@ -487,7 +497,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------
-    // 6. CAR LIST DISPLAY (Existing Logic)
+    // 6. CAR LIST DISPLAY (UPDATED WITH STATUS FILTER)
     // ---------------------------------------------------------
     const economyGrid = document.getElementById('grid-Economy');
     const suvGrid = document.getElementById('grid-SUV');
@@ -497,6 +507,10 @@ document.addEventListener('DOMContentLoaded', () => {
         db.collection("cars").get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 const car = doc.data();
+                
+                // FILTER: Hide if Rented
+                if (car.status === "Rented") return;
+
                 const carHTML = `
                 <div class="car-card">
                     <div class="car-image-box">
@@ -506,7 +520,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h4>${car.name}</h4>
                         <p class="price">RM${car.price} <span class="per-day">/ day</span></p>
                         <p class="description">${car.description}</p>
-                        <button class="btn-select" data-name="${car.name}" data-price="${car.price}">Select</button>
+                        <button class="btn-select" data-id="${doc.id}" data-name="${car.name}" data-price="${car.price}">Select</button>
                     </div>
                 </div>`;
                 if (car.category === "Economy" && economyGrid) { document.getElementById('section-Economy').style.display = 'block'; economyGrid.innerHTML += carHTML; }
@@ -517,6 +531,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 button.addEventListener('click', function() {
                     sessionStorage.setItem('selectedCarName', this.getAttribute('data-name'));
                     sessionStorage.setItem('selectedCarPrice', this.getAttribute('data-price'));
+                    // Save ID for booking Logic
+                    sessionStorage.setItem('selectedCarId', this.getAttribute('data-id'));
                     window.location.href = 'booking.html';
                 });
             });
