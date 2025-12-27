@@ -1,5 +1,5 @@
 /* =========================================
-   script.js - COMPLETE (Auth, Booking, Support, Location, PDF, Vendor Tabs + Fleet Status Fix)
+   script.js - COMPLETE (Auth, Booking, Support, Location, PDF, Vendor Fleet, Returns, Ratings)
    ========================================= */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -255,7 +255,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // LOAD VENDOR DASHBOARD
                     if (role === 'vendor' && path.includes('vendor.html')) {
-                        // By default load fleet & orders (hidden/shown by tabs)
                         loadVendorFleet(user.uid);
                     }
                 }
@@ -367,7 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         customerName: userName, 
                         status: "Active", 
                         paymentMethod: selectedMethod, 
-                        createdAt: new Date()
+                        createdAt: new Date(),
+                        isRated: false // NEW: Track if rated
                     };
 
                     return db.collection("users").doc(user.uid).collection("bookings").add(newBooking)
@@ -391,7 +391,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------
-    // 5. VENDOR LOGIC (UPDATED WITH FLEET TAB & CUSTOMER DETAILS)
+    // 5. VENDOR LOGIC (UPDATED WITH RETURNS)
     // ---------------------------------------------------------
     
     // TAB SWITCHING LOGIC
@@ -440,6 +440,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 description: document.getElementById('v-desc').value,
                 vendorId: auth.currentUser.uid, 
                 status: "Available",
+                ratingCount: 0,   // NEW
+                averageRating: 0, // NEW
                 createdAt: new Date()
             };
 
@@ -451,16 +453,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // =========================================================
-    // FIXED: LOAD VENDOR FLEET WITH ROBUST FILTERING
-    // =========================================================
+    // LOAD FLEET (WITH MARK RETURNED BUTTON)
     function loadVendorFleet(vendorUid) {
         const listDiv = document.getElementById('vendor-fleet-list');
         if (!listDiv) return;
         
         listDiv.innerHTML = '<p style="text-align:center; color:gray;">Loading fleet...</p>';
 
-        // 1. Get Cars belonging to this vendor
         db.collection("cars").where("vendorId", "==", vendorUid).get()
         .then(async (carSnaps) => {
             if (carSnaps.empty) {
@@ -468,26 +467,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // 2. Safer Fetch: Get ALL bookings first, then filter in JS
-            // This prevents the "Missing Index" error that causes the loading to hang
+            // Get active bookings
             let activeBookings = [];
             try {
-                // Fetch ALL bookings from all users (Collection Group)
                 const bookingsSnap = await db.collectionGroup('bookings').get();
-                
-                // Filter manually for 'Active' status
                 bookingsSnap.forEach(doc => {
                     const data = doc.data();
                     if (data.status === 'Active') {
+                        // STORE DOC PATH TO UPDATE IT LATER
+                        data.docPath = doc.ref.path; 
                         activeBookings.push(data);
                     }
                 });
-            } catch (err) {
-                console.log("Error fetching bookings:", err);
-                // We continue even if this fails, just so the cars still show up
-            }
+            } catch (err) { console.log("Error fetching bookings:", err); }
 
-            // 3. Build HTML
             let html = '';
             carSnaps.forEach(doc => {
                 const car = doc.data();
@@ -495,7 +488,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 let customerInfo = '';
                 if (car.status === 'Rented') {
-                    // Match car name to booking
                     const booking = activeBookings.find(b => b.carName === car.name);
                     if (booking) {
                         customerInfo = `
@@ -505,16 +497,25 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </p>
                                 <p style="color:#e2e8f0; font-size:0.9rem; margin-bottom:0.2rem;"><strong>Name:</strong> ${booking.customerName || 'N/A'}</p>
                                 <p style="color:#e2e8f0; font-size:0.9rem; margin-bottom:0.2rem;"><strong>Phone:</strong> ${booking.phone || 'N/A'}</p>
-                                <p style="color:#9ca3af; font-size:0.8rem;"><strong>Return Date:</strong> ${booking.dateRange.split(' to ')[1] || 'N/A'}</p>
+                                <p style="color:#9ca3af; font-size:0.8rem; margin-bottom: 0.8rem;"><strong>Return Date:</strong> ${booking.dateRange.split(' to ')[1] || 'N/A'}</p>
+                                
+                                <button class="btn-return" 
+                                    style="width:100%; background:#28a745; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer;"
+                                    data-car-id="${doc.id}" 
+                                    data-booking-path="${booking.docPath}">
+                                    Mark as Returned
+                                </button>
                             </div>
                         `;
                     } else {
-                        customerInfo = `<p style="color:#9ca3af; font-size:0.8rem; margin-top:0.5rem;"><em>Rented, but booking details unavailable.</em></p>`;
+                        customerInfo = `<p style="color:#9ca3af; font-size:0.8rem; margin-top:0.5rem;"><em>Rented, but details unavailable.</em></p>`;
+                        // Fallback button just to free the car
+                        customerInfo += `<button class="btn-return" style="width:100%; margin-top:5px; background:#444; color:white; border:none; padding:5px; cursor:pointer;" data-car-id="${doc.id}" data-booking-path="">Force Available</button>`;
                     }
                 }
 
                 html += `
-                <div style="background:#1a202c; padding:1.2rem; border-radius:8px; border:1px solid #2d3748; margin-bottom: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3);">
+                <div style="background:#1a202c; padding:1.2rem; border-radius:8px; border:1px solid #2d3748; margin-bottom: 1rem;">
                     <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 0.5rem;">
                         <div>
                             <h4 style="color:white; font-size:1.1rem; font-weight:700; margin-bottom:0.2rem;">${car.name}</h4>
@@ -529,10 +530,31 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             listDiv.innerHTML = html;
+
+            // ATTACH EVENT LISTENERS FOR RETURNS
+            document.querySelectorAll('.btn-return').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const carId = this.getAttribute('data-car-id');
+                    const bookingPath = this.getAttribute('data-booking-path');
+
+                    if(confirm("Confirm this car has been returned?")) {
+                        // 1. Update Car to Available
+                        db.collection("cars").doc(carId).update({ status: "Available" })
+                        .then(() => {
+                            // 2. Update Booking to Completed (if we found it)
+                            if (bookingPath) {
+                                db.doc(bookingPath).update({ status: "Completed" });
+                            }
+                            alert("Car marked as returned!");
+                            loadVendorFleet(vendorUid); // Refresh
+                        });
+                    }
+                });
+            });
         })
         .catch(err => {
             console.error(err);
-            listDiv.innerHTML = '<p style="text-align:center; color:#ef4444;">Error loading fleet. Check console.</p>';
+            listDiv.innerHTML = '<p style="text-align:center; color:#ef4444;">Error loading fleet.</p>';
         });
     }
 
@@ -577,7 +599,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------
-    // 6. CAR LIST DISPLAY (UPDATED WITH STATUS FILTER)
+    // 6. CAR LIST DISPLAY (UPDATED WITH STARS)
     // ---------------------------------------------------------
     const economyGrid = document.getElementById('grid-Economy');
     const suvGrid = document.getElementById('grid-SUV');
@@ -587,9 +609,16 @@ document.addEventListener('DOMContentLoaded', () => {
         db.collection("cars").get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
                 const car = doc.data();
-                
-                // FILTER: Hide if Rented
                 if (car.status === "Rented") return;
+
+                // STAR RATING LOGIC
+                let starsHTML = '';
+                if (!car.ratingCount || car.ratingCount === 0) {
+                    starsHTML = '<span style="color:#fbbf24; font-size:0.85rem;">New Car</span>';
+                } else {
+                    const rating = car.averageRating.toFixed(1);
+                    starsHTML = `<span style="color:#fbbf24; font-size:0.9rem;">★ ${rating}</span> <span style="color:#666; font-size:0.8rem;">(${car.ratingCount})</span>`;
+                }
 
                 const carHTML = `
                 <div class="car-card">
@@ -597,7 +626,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <img src="${car.image}" alt="${car.name}" class="car-img" onerror="this.src='images/Vios.jpg'">
                     </div>
                     <div class="car-details">
-                        <h4>${car.name}</h4>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <h4>${car.name}</h4>
+                            <div style="text-align:right;">${starsHTML}</div>
+                        </div>
                         <p class="price">RM${car.price} <span class="per-day">/ day</span></p>
                         <p class="description">${car.description}</p>
                         <button class="btn-select" data-id="${doc.id}" data-name="${car.name}" data-price="${car.price}">Select</button>
@@ -619,7 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ---------------------------------------------------------
-    // 7. OTHER PAGE LOGIC (Support, Profile, My Bookings)
+    // 7. OTHER PAGE LOGIC (Support, Profile, My Bookings UPDATED)
     // ---------------------------------------------------------
     const bookingsListContainer = document.getElementById('bookings-list');
     if (bookingsListContainer) {
@@ -634,13 +666,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             } else { bookingsListContainer.innerHTML = '<p style="color:white;">Please log in.</p>'; }
         });
+        
         function renderBookings(bookings) {
             document.getElementById('bookings-title').textContent = `MY BOOKINGS (${bookings.length} Total)`;
             bookingsListContainer.innerHTML = ''; 
             if(bookings.length === 0) { bookingsListContainer.innerHTML = '<p style="color:gray;">No bookings found.</p>'; return; }
+            
             bookings.forEach((booking, index) => {
-                const badgeClass = booking.status === "Active" ? "active" : "completed";
-                const btnHtml = booking.status === "Active" ? `<button class="btn-cancel" data-doc-id="${booking.realDocId}">Cancel</button>` : `<button class="btn-receipt">Download Receipt</button>`;
+                let badgeClass = "active";
+                let btnHtml = "";
+
+                if (booking.status === "Active") {
+                    badgeClass = "active";
+                    btnHtml = `<button class="btn-cancel" data-doc-id="${booking.realDocId}">Cancel</button>`;
+                } else if (booking.status === "Completed") {
+                    badgeClass = "completed";
+                    // If not rated yet, show Rate button
+                    if (!booking.isRated) {
+                        btnHtml = `<button class="btn-rate" data-doc-id="${booking.realDocId}" data-car-name="${booking.carName}">Rate Car</button>`;
+                    } else {
+                        btnHtml = `<span style="color:#28a745; font-size:0.9rem;">Thanks for rating!</span>`;
+                    }
+                    // Also download receipt for past
+                    btnHtml += ` <button class="btn-receipt" style="margin-left:10px;">Receipt</button>`;
+                }
+
                 bookingsListContainer.innerHTML += `
                     <div class="booking-card">
                         <div class="card-top"><h3>${booking.status === "Active" ? "Upcoming" : "Past"} Rental</h3><span class="status-badge ${badgeClass}">${booking.status}</span></div>
@@ -651,6 +701,48 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="card-actions"><a href="#" class="btn-view-details" data-index="${index}">View Details</a>${btnHtml}</div>
                     </div>`;
             });
+
+            // LOGIC FOR RATING
+            document.querySelectorAll('.btn-rate').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const carName = this.getAttribute('data-car-name');
+                    const bookingId = this.getAttribute('data-doc-id');
+                    
+                    const rating = prompt(`How many stars (1-5) for your ${carName}?`);
+                    if (rating && rating >= 1 && rating <= 5) {
+                        const numRating = parseInt(rating);
+                        
+                        // 1. Find the car document to update average
+                        const carsSnap = await db.collection("cars").where("name", "==", carName).limit(1).get();
+                        if (!carsSnap.empty) {
+                            const carDoc = carsSnap.docs[0];
+                            const carData = carDoc.data();
+                            
+                            // Math: New Average
+                            const oldAvg = carData.averageRating || 0;
+                            const oldCount = carData.ratingCount || 0;
+                            const newCount = oldCount + 1;
+                            const newAvg = ((oldAvg * oldCount) + numRating) / newCount;
+
+                            await db.collection("cars").doc(carDoc.id).update({
+                                averageRating: newAvg,
+                                ratingCount: newCount
+                            });
+                        }
+
+                        // 2. Mark booking as rated
+                        await db.collection("users").doc(auth.currentUser.uid).collection("bookings").doc(bookingId).update({
+                            isRated: true
+                        });
+
+                        alert("Thank you for your feedback!");
+                        location.reload();
+                    } else {
+                        alert("Please enter a number between 1 and 5.");
+                    }
+                });
+            });
+
             document.querySelectorAll('.btn-view-details').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
